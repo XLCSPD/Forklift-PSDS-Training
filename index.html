@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forklift Point Transfer Training</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      @font-face {
+        font-family: 'LucideIcons';
+        /* Correct: Lucide font via unpkg */
+        src: url(https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf) format('truetype');
+      }
+      .lucide {
+        font-family: 'LucideIcons';
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-rendering: auto;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      /* Basic animation */
+      .fade-in {
+        animation: fadeIn 0.5s ease-in-out;
+      }
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      /* Style for simulated scanner screen */
+      .scanner-screen {
+        font-family: monospace;
+        background-color: #c8e6c9; /* Light green background */
+        color: #004d40; /* Dark green text */
+        border: 4px solid #388e3c; /* Darker green border */
+        padding: 15px;
+        border-radius: 8px;
+        min-height: 200px;
+        white-space: pre; /* Preserve whitespace and line breaks */
+        line-height: 1.4;
+        overflow-x: auto; /* Allow horizontal scroll if needed */
+      }
+      .scanner-highlight {
+        background-color: #fff59d; /* Yellow highlight */
+        font-weight: bold;
+        padding: 2px;
+        border-radius: 3px;
+      }
+       /* Style for quiz options */
+      .quiz-option {
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+      }
+      .quiz-option.selected {
+        background-color: #bbdefb; /* Light blue when selected */
+        border-color: #1976d2;
+      }
+      /* Ensure body takes full height */
+      html, body {
+        height: 100%;
+        margin: 0;
+      }
+      body {
+         font-family: 'Inter', sans-serif; /* Apply Inter font */
+      }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-2xl">
+
+        <div id="welcome-screen" class="text-center fade-in">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Forklift Point Transfer Training</h1>
+            <p class="text-gray-600 mb-6">Learn the steps for using the scanner for directed work orders. Please enter your details below.</p>
+            <div class="mb-4 max-w-sm mx-auto text-left">
+                <label for="userName" class="block text-sm font-medium text-gray-700 mb-1">User Name:</label>
+                <input type="text" id="userName" name="userName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="mb-6 max-w-sm mx-auto text-left">
+                <label for="employeeId" class="block text-sm font-medium text-gray-700 mb-1">Employee ID:</label>
+                <input type="text" id="employeeId" name="employeeId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <button onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                Start Training <span class="lucide ml-2">&#xea3c;</span> </button>
+        </div>
+
+        <div id="training-container" class="hidden">
+            <div id="step-content" class="mb-6 fade-in"></div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="prev-button" onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center" disabled>
+                    <span class="lucide mr-2">&#xea3a;</span> Prev </button>
+                <span id="step-indicator" class="text-sm text-gray-500">Step 1 / X</span>
+                <button id="next-button" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center">
+                    Next <span class="lucide ml-2">&#xea3c;</span> </button>
+                <button id="quiz-button" onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out hidden">
+                    Start Quiz <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="hidden">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">Knowledge Check</h2>
+            <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in">
+                </div>
+            <div class="text-center">
+                 <button id="submit-quiz-button" onclick="submitQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out hidden">
+                    Submit Answers
+                </button>
+                 <button id="next-question-button" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
+                    Next Question <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="results-screen" class="hidden text-center fade-in">
+            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Training Complete!</h2>
+            <div id="score-display" class="text-lg text-gray-700 mb-6">
+                </div>
+            <p class="text-gray-600 mb-6">Review the steps if needed, or download your results.</p>
+            <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                 <button onclick="downloadResults()" id="download-csv-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Restart Training <span class="lucide ml-2">&#xe91b;</span> </button>
+            </div>
+        </div>
+
+        <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <p id="message-text" class="mb-4 text-gray-700"></p>
+                <button onclick="closeMessageBox()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
+                    OK
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- Configuration ---
+        const trainingSteps = [
+             // Steps 1-4 remain the same...
+             {
+                title: "Step 1: Select Vehicle Type",
+                description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.",
+                scannerContent: `
+ Work Information
+ Warehouse ID: AO
+ Loc: 2M01
+ Vehicle Type: <span class="scanner-highlight">REACH2</span>
+ Work Area:
+                `
+            },
+            {
+                title: "Step 2: Leave Work Area Empty & Enter",
+                description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.",
+                scannerContent: `
+ Work Information
+ Warehouse ID: AO
+ Loc: 2M01
+ Vehicle Type: REACH2
+ Work Area: <span class="scanner-highlight">[Leave Empty]</span>
+                `
+            },
+            {
+                title: "Step 3: Choose Directed Work",
+                description: "The 'Undirected Menu' will appear. Select option '8' for 'Directed Work Menu' and press Enter.",
+                scannerContent: `
+ Undirected Menu
+ 1 Picking Menu        7 Yard Menu
+ 2 Inventory Menu      <span class="scanner-highlight">8 Directed Work</span>
+ 3 Receiving Menu      9 Labor Statistics
+ 4 Shipping Menu
+ 5 Production Menu
+ 6 Cycle Count Menu
+ Enter Option: <span class="scanner-highlight">8</span>
+                `
+            },
+            {
+                title: "Step 4: Find the Source Location",
+                description: "Wait for the system. It will show you the 'Source Location'. This is where you need to go to pick up the pallet.",
+                scannerContent: `
+ Pickup Product At
+ Source Location: <span class="scanner-highlight">2L46B</span>
+
+ Press Enter To Acknowledge
+                `
+            },
+            { // Updated Step 5
+                title: "Step 5: Scan the ULID (Use the Scanner!)",
+                description: "Go to the Source Location. Find the pallet and scan the ULID number printed on it using your SCAN GUN. The system should fill in the item details automatically. \n\n<span class='font-bold text-red-600'>IMPORTANT: Always use the scanner gun for accuracy and speed. DO NOT type the number manually unless absolutely necessary and approved by a supervisor.</span>",
+                scannerContent: `
+ Wrk Order Pick
+ Loc: 2L46B
+ ID: <span class="scanner-highlight">001620182280</span>   <- Scan This with Gun!
+ Itm: 90787527
+ Lot: BLST FUS SKNGRD
+ Q:   2160 EA
+                `
+            },
+             { // Step 6 remains the same
+                title: "Step 6: Verify Details",
+                description: "IMPORTANT: Check that the Item number and Quantity on the screen match the actual pallet you picked up.",
+                scannerContent: `
+ Wrk Order Pick
+ Loc: 2L46B
+ ID:  001620182280
+ Itm: <span class="scanner-highlight">90787527</span>      <- Verify
+ Lot: BLST FUS SKNGRD
+ Q:   <span class="scanner-highlight">2160 EA</span>        <- Verify
+                `
+            },
+            { // Step 7 remains the same
+                title: "Step 7: Find Deposit Location",
+                description: "Press Enter. The screen will now show you the 'Deposit Location'. Take the pallet to this location (e.g., 2P17A).",
+                scannerContent: `
+ Product Deposit
+ Lod: 00300474002721350824
+ Itm: 80374707
+ Q:   8100 EA
+ Loc: <span class="scanner-highlight">2P17A</span>          <- Go Here
+
+ Scan Location to Deposit
+                `
+            },
+            { // Step 8 remains the same
+                title: "Step 8: Scan Location & Deposit",
+                description: "Once you arrive at the correct deposit location (e.g., 2P17A), scan the location label to confirm, then deposit the pallet.",
+                scannerContent: `
+ Product Deposit
+ Lod: 00300474002721350824
+ Itm: 80374707
+ Q:   8100 EA
+ Loc: <span class="scanner-highlight">2P17A</span>          <- Scan this location label
+
+ Deposit Complete!
+                `
+            },
+            { // Step 9 remains the same
+                title: "Step 9: Handling Overrides (If Needed)",
+                description: "If you can't deposit the pallet (e.g., location is full), press the 'F4' key to override.",
+                scannerContent: `
+ Product Deposit
+ Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>
+
+ Cannot Deposit Here?
+                `
+            },
+            { // Step 10 remains the same
+                title: "Step 10: Select Override Reason",
+                description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.",
+                scannerContent: `
+ Override Location
+ Lod: 00100474091617976961
+ Loc: 2L55B
+ Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)
+ Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location
+
+ Press Enter
+                `
+            }
+        ];
+
+        const quizQuestions = [
+            // Original questions 1-4
+            {
+                question: "When you start, what's the first thing you need to choose on the screen?",
+                options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"],
+                correctAnswer: "Vehicle Type"
+            },
+            {
+                question: "After picking the vehicle, what menu option do you choose to get your task?",
+                options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"],
+                correctAnswer: "Option 8 (Directed Work)"
+            },
+            {
+                question: "What information does the system give you *before* you physically pick up the pallet?",
+                options: ["Deposit Location", "Item Quantity", "ULID Number", "Source Location"],
+                correctAnswer: "Source Location"
+            },
+            { // Updated question 4 wording slightly for clarity
+                question: "What specific number printed on the pallet itself should you input into the system?",
+                options: ["Item Number", "Lot Number", "ULID number", "Location Code"],
+                correctAnswer: "ULID number"
+            },
+            { // New question about scanning
+                question: "How should you normally enter the ULID number into the system?",
+                options: ["Scan it with the gun", "Type it manually", "Write it down first", "Ask a supervisor"],
+                correctAnswer: "Scan it with the gun"
+            },
+            { // Original question 5 (now 6)
+                question: "What key should you press if you get to the drop-off spot and the pallet won't fit or can't be placed there?",
+                options: ["Enter", "F1", "F2", "F4"],
+                correctAnswer: "F4"
+            },
+             { // Original question 6 (now 7)
+                question: "After pressing F4 for an override, which key helps you select the *reason* for the override?",
+                options: ["Enter", "F1", "F2", "F4"],
+                correctAnswer: "F2"
+            }
+        ];
+
+        // --- State Variables ---
+        let currentStep = 0;
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let score = 0;
+        let userName = ''; // Store user name
+        let employeeId = ''; // Store employee ID
+
+        // --- DOM Elements ---
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const userNameInput = document.getElementById('userName');
+        const employeeIdInput = document.getElementById('employeeId');
+        const trainingContainer = document.getElementById('training-container');
+        const stepContent = document.getElementById('step-content');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const quizButton = document.getElementById('quiz-button');
+        const stepIndicator = document.getElementById('step-indicator');
+        const quizContainer = document.getElementById('quiz-container');
+        const quizQuestionDiv = document.getElementById('quiz-question');
+        const nextQuestionButton = document.getElementById('next-question-button');
+        const submitQuizButton = document.getElementById('submit-quiz-button');
+        const resultsScreen = document.getElementById('results-screen');
+        const scoreDisplay = document.getElementById('score-display');
+        const downloadCsvButton = document.getElementById('download-csv-button');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+
+        // --- Functions ---
+
+        function showScreen(screenToShow) {
+            // Hide all screens first
+            welcomeScreen.classList.add('hidden');
+            trainingContainer.classList.add('hidden');
+            quizContainer.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            // Show the requested screen
+            screenToShow.classList.remove('hidden');
+             // Ensure body takes full height for centering content vertically
+            document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center');
+
+        }
+
+        function startTraining() {
+            // Get and validate user input
+            const name = userNameInput.value.trim();
+            const id = employeeIdInput.value.trim();
+
+            if (!name || !id) {
+                showMessage("Please enter both your User Name and Employee ID.");
+                return;
+            }
+
+            // Store user info
+            userName = name;
+            employeeId = id;
+
+            // Proceed with training
+            currentStep = 0;
+            showScreen(trainingContainer);
+            displayStep(currentStep);
+        }
+
+        function displayStep(stepIndex) {
+            if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
+
+            const step = trainingSteps[stepIndex];
+            // Use innerHTML carefully; ensure content is controlled or sanitized if dynamic
+            stepContent.innerHTML = `
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2>
+                <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p> <div class="scanner-screen">${step.scannerContent.trim()}</div>
+            `;
+            stepContent.scrollTop = 0; // Scroll to top of content
+
+            // Update step indicator
+            stepIndicator.textContent = `Step ${stepIndex + 1} / ${trainingSteps.length}`;
+
+            // Update button states
+            prevButton.disabled = stepIndex === 0;
+            prevButton.classList.toggle('opacity-50', stepIndex === 0);
+            prevButton.classList.toggle('cursor-not-allowed', stepIndex === 0);
+
+            if (stepIndex === trainingSteps.length - 1) {
+                // Last step
+                nextButton.classList.add('hidden');
+                quizButton.classList.remove('hidden');
+            } else {
+                nextButton.classList.remove('hidden');
+                quizButton.classList.add('hidden');
+            }
+
+             // Add fade-in animation
+            stepContent.classList.remove('fade-in');
+            void stepContent.offsetWidth; // Trigger reflow to restart animation
+            stepContent.classList.add('fade-in');
+        }
+
+        function nextStep() {
+            if (currentStep < trainingSteps.length - 1) {
+                currentStep++;
+                displayStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            if (currentStep > 0) {
+                currentStep--;
+                displayStep(currentStep);
+            }
+        }
+
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            userAnswers = new Array(quizQuestions.length).fill(null); // Reset answers for the correct number of questions
+            score = 0;
+            showScreen(quizContainer);
+            displayQuestion(currentQuestionIndex);
+            // Initially show Next button, hide Submit button
+            submitQuizButton.classList.add('hidden');
+            nextQuestionButton.classList.remove('hidden');
+        }
+
+        function displayQuestion(index) {
+            if (index < 0 || index >= quizQuestions.length) return;
+
+            const q = quizQuestions[index];
+            let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p>`;
+            optionsHtml += '<div class="space-y-3">'; // Container for options
+
+            q.options.forEach((option) => {
+                // Escape single quotes within the option text for the onclick handler
+                const escapedOption = option.replace(/'/g, "\\'");
+                const isSelected = userAnswers[index] === option;
+                optionsHtml += `
+                    <div
+                        class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}"
+                        onclick="selectAnswer(${index}, '${escapedOption}')">
+                        ${option}
+                    </div>
+                `;
+            });
+             optionsHtml += '</div>'; // Close container
+
+            quizQuestionDiv.innerHTML = optionsHtml;
+
+             // Manage button visibility: Show Submit only on the last question
+             if(index === quizQuestions.length - 1) {
+                 nextQuestionButton.classList.add('hidden');
+                 submitQuizButton.classList.remove('hidden');
+             } else {
+                 nextQuestionButton.classList.remove('hidden');
+                 submitQuizButton.classList.add('hidden');
+             }
+
+             // Add fade-in animation
+             quizQuestionDiv.classList.remove('fade-in');
+             void quizQuestionDiv.offsetWidth; // Trigger reflow
+             quizQuestionDiv.classList.add('fade-in');
+        }
+
+        function selectAnswer(questionIndex, answer) {
+            userAnswers[questionIndex] = answer;
+            // Re-display the question to show the selection visually
+            displayQuestion(questionIndex);
+        }
+
+        function nextQuestion() {
+             // Check if an answer was selected for the current question
+            if (userAnswers[currentQuestionIndex] === null) {
+                showMessage("Please select an answer before proceeding.");
+                return;
+            }
+
+            // Move to the next question if not the last one
+            if (currentQuestionIndex < quizQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion(currentQuestionIndex);
+            }
+            // Note: The logic to show the submit button on the last question is handled within displayQuestion
+        }
+
+
+        function submitQuiz() {
+             // Check if the last question was answered
+            if (userAnswers[currentQuestionIndex] === null) {
+                showMessage("Please select an answer for the final question.");
+                return;
+            }
+
+            // Calculate score
+            score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === quizQuestions[index].correctAnswer) {
+                    score++;
+                }
+            });
+
+            // Display results
+            scoreDisplay.innerHTML = `User: <span class="font-bold">${userName}</span> (ID: <span class="font-bold">${employeeId}</span>)<br> You answered <span class="font-bold text-blue-600">${score}</span> out of <span class="font-bold">${quizQuestions.length}</span> questions correctly.`;
+            showScreen(resultsScreen);
+        }
+
+         function showMessage(message) {
+            messageText.textContent = message;
+            messageBox.classList.remove('hidden');
+        }
+
+        function closeMessageBox() {
+            messageBox.classList.add('hidden');
+        }
+
+        function downloadResults() {
+            // Get current timestamp
+            const timestamp = new Date().toLocaleString();
+
+            // Prepare CSV header and data row
+            const csvHeader = "UserName,EmployeeID,Score,TotalQuestions,Timestamp\n";
+            // Escape potential commas or quotes in user name/ID
+            const safeUserName = `"${userName.replace(/"/g, '""')}"`;
+            const safeEmployeeId = `"${employeeId.replace(/"/g, '""')}"`;
+            const csvData = `${safeUserName},${safeEmployeeId},${score},${quizQuestions.length},"${timestamp}"\n`;
+            const csvContent = csvHeader + csvData;
+
+            // Create a Blob object
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+
+            // Create a temporary link element
+            const link = document.createElement("a");
+            // Check if download attribute is supported (standard way)
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                // Create a filename including employee ID and date
+                const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+                link.setAttribute("download", `Forklift_Quiz_${employeeId}_${dateStr}.csv`);
+                link.style.visibility = 'hidden'; // Hide the link
+                document.body.appendChild(link); // Append link to the body
+                link.click(); // Programmatically click the link to trigger download
+                document.body.removeChild(link); // Remove the link from the body
+                URL.revokeObjectURL(url); // Clean up the object URL
+            } else {
+                // Fallback or error message if download attribute is not supported
+                showMessage("CSV download is not directly supported in this browser/environment.");
+            }
+        }
+
+
+        function restartTraining() {
+            // Clear user info fields for the next user
+            userNameInput.value = '';
+            employeeIdInput.value = '';
+            userName = '';
+            employeeId = '';
+            // Reset state variables
+            currentStep = 0;
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            score = 0;
+            // Show the welcome screen
+            showScreen(welcomeScreen);
+        }
+
+        // --- Initial Setup ---
+        // Ensure welcome screen is shown initially
+        showScreen(welcomeScreen);
+
+    </script>
+
+</body>
+</html>
