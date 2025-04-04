@@ -11,7 +11,7 @@
     <style>
       @font-face {
         font-family: 'LucideIcons';
-        /* Correct: Lucide font via unpkg */
+         /* Correct: Lucide font via unpkg */
         src: url(https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf) format('truetype');
       }
       .lucide {
@@ -68,24 +68,56 @@
       body {
          font-family: 'Inter', sans-serif; /* Apply Inter font */
       }
+      /* Certificate Styling - Unchanged */
+      .certificate {
+        border: 10px solid #facc15; /* Yellow-400 */
+        background-color: #fefce8; /* Yellow-50 */
+        padding: 2rem 3rem;
+        text-align: center;
+        max-width: 600px;
+        margin: auto;
+        position: relative;
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+      .certificate h2 { font-size: 1.8rem; font-weight: bold; color: #1f2937; margin-bottom: 0.5rem; letter-spacing: 1px; }
+      .certificate .subtitle { font-size: 1.1rem; font-weight: 600; color: #ca8a04; margin-bottom: 2rem; text-transform: uppercase; }
+      .certificate .recipient-name { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; border-bottom: 2px solid #facc15; display: inline-block; padding-bottom: 0.5rem; }
+      .certificate .acknowledgment { font-size: 0.9rem; color: #4b5563; margin-bottom: 2.5rem; }
+      .certificate .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; }
+      .certificate .date { font-size: 0.9rem; color: #4b5563; }
+      .certificate .logo { font-size: 2.5rem; font-weight: bold; color: #1f2937; line-height: 1; }
+      .certificate .logo span { display: block; font-size: 0.8rem; font-weight: normal; letter-spacing: 2px; color: #4b5563; }
+      .certificate::before, .certificate::after { content: ''; position: absolute; width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 50%; z-index: -1; }
+      .certificate::before { top: -25px; left: -25px; }
+      .certificate::after { top: -25px; right: -25px; }
+
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-2xl">
 
-        <div id="welcome-screen" class="text-center fade-in">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4">Forklift Point Transfer Training</h1>
-            <p class="text-gray-600 mb-6">Learn the steps for using the scanner for directed work orders. Please enter your details below.</p>
-            <div class="mb-4 max-w-sm mx-auto text-left">
-                <label for="userName" class="block text-sm font-medium text-gray-700 mb-1">User Name:</label>
-                <input type="text" id="userName" name="userName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        <div id="welcome-screen" class="fade-in">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center">Forklift Point Transfer Training</h1>
+            <p class="text-gray-600 mb-6 text-center">Learn the steps for using the scanner for directed work orders. Please enter your details below.</p>
+            <div class="space-y-4 max-w-md mx-auto">
+                <div>
+                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="xlcId" class="block text-sm font-medium text-gray-700 mb-1">XLC_ID:</label>
+                    <input type="text" id="xlcId" name="xlcId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                 </div>
+            <div class="text-center mt-6">
+                <button onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                    Start Training <span class="lucide ml-2">&#xea3c;</span> </button>
             </div>
-            <div class="mb-6 max-w-sm mx-auto text-left">
-                <label for="employeeId" class="block text-sm font-medium text-gray-700 mb-1">Employee ID:</label>
-                <input type="text" id="employeeId" name="employeeId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-            </div>
-            <button onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
-                Start Training <span class="lucide ml-2">&#xea3c;</span> </button>
         </div>
 
         <div id="training-container" class="hidden">
@@ -102,7 +134,10 @@
         </div>
 
         <div id="quiz-container" class="hidden">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4 text-center">Knowledge Check</h2>
+             <div class="flex justify-between items-center mb-3">
+                 <h2 class="text-xl md:text-2xl font-bold text-gray-800">Knowledge Check</h2>
+                 <span id="attempt-indicator" class="text-sm font-medium text-gray-600 bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Attempt 1 / 3</span>
+             </div>
             <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in">
                 </div>
             <div class="text-center">
@@ -115,17 +150,44 @@
         </div>
 
         <div id="results-screen" class="hidden text-center fade-in">
-            <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Training Complete!</h2>
-            <div id="score-display" class="text-lg text-gray-700 mb-6">
+            <h2 id="results-title" class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Quiz Results</h2>
+            <div id="score-display" class="text-lg text-gray-700 mb-6 bg-red-100 border border-red-300 p-4 rounded-md">
                 </div>
-            <p class="text-gray-600 mb-6">Review the steps if needed, or download your results.</p>
-            <div class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                 <button onclick="downloadResults()" id="download-csv-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+            <p id="results-message" class="text-gray-600 mb-6">Please review the training material again.</p>
+            <div id="results-actions" class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                 <button onclick="startQuiz()" id="retry-quiz-button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Retry Quiz <span class="lucide ml-2">&#xe91b;</span> </button>
+                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
                     Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
                 <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
-                    Restart Training <span class="lucide ml-2">&#xe91b;</span> </button>
+                    Restart Training <span class="lucide ml-2">&#xe89b;</span> </button>
             </div>
         </div>
+
+         <div id="certificate-screen" class="hidden fade-in">
+             <div class="certificate">
+                 <h2>CERTIFICATE</h2>
+                 <p class="subtitle">OF COMPLETION</p>
+                 <p class="subtitle" style="margin-bottom: 1rem;">POINT TRANSFER TRAINING</p>
+                 <div id="certificate-recipient" class="recipient-name">Recipient Name</div>
+                 <p class="acknowledgment">
+                     in acknowledgment of successful completion<br>of the Point Transfer Training
+                 </p>
+                 <div class="footer">
+                     <div id="certificate-date" class="date">[Date]</div>
+                     <div class="logo">XLC <span>SERVICES</span></div>
+                 </div>
+             </div>
+             <div class="text-center mt-6">
+                <button onclick="downloadCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
+                    Download Certificate (PNG) <span class="lucide ml-2">&#xe919;</span> </button>
+                 <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
+                    Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                 <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                    Start New Training <span class="lucide ml-2">&#xe89b;</span> </button>
+             </div>
+        </div>
+
 
         <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
             <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
@@ -138,265 +200,219 @@
 
     </div>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
     <script>
         // --- Configuration ---
+        const PASSING_PERCENTAGE = 80;
+        const MAX_ATTEMPTS = 3;
+
+        // Training steps remain the same
         const trainingSteps = [
-             // Steps 1-4 remain the same...
-             {
-                title: "Step 1: Select Vehicle Type",
-                description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.",
-                scannerContent: `
- Work Information
- Warehouse ID: AO
- Loc: 2M01
- Vehicle Type: <span class="scanner-highlight">REACH2</span>
- Work Area:
-                `
-            },
-            {
-                title: "Step 2: Leave Work Area Empty & Enter",
-                description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.",
-                scannerContent: `
- Work Information
- Warehouse ID: AO
- Loc: 2M01
- Vehicle Type: REACH2
- Work Area: <span class="scanner-highlight">[Leave Empty]</span>
-                `
-            },
-            {
-                title: "Step 3: Choose Directed Work",
-                description: "The 'Undirected Menu' will appear. Select option '8' for 'Directed Work Menu' and press Enter.",
-                scannerContent: `
- Undirected Menu
- 1 Picking Menu        7 Yard Menu
- 2 Inventory Menu      <span class="scanner-highlight">8 Directed Work</span>
- 3 Receiving Menu      9 Labor Statistics
- 4 Shipping Menu
- 5 Production Menu
- 6 Cycle Count Menu
- Enter Option: <span class="scanner-highlight">8</span>
-                `
-            },
-            {
-                title: "Step 4: Find the Source Location",
-                description: "Wait for the system. It will show you the 'Source Location'. This is where you need to go to pick up the pallet.",
-                scannerContent: `
- Pickup Product At
- Source Location: <span class="scanner-highlight">2L46B</span>
-
- Press Enter To Acknowledge
-                `
-            },
-            { // Updated Step 5
-                title: "Step 5: Scan the ULID (Use the Scanner!)",
-                description: "Go to the Source Location. Find the pallet and scan the ULID number printed on it using your SCAN GUN. The system should fill in the item details automatically. \n\n<span class='font-bold text-red-600'>IMPORTANT: Always use the scanner gun for accuracy and speed. DO NOT type the number manually unless absolutely necessary and approved by a supervisor.</span>",
-                scannerContent: `
- Wrk Order Pick
- Loc: 2L46B
- ID: <span class="scanner-highlight">001620182280</span>   <- Scan This with Gun!
- Itm: 90787527
- Lot: BLST FUS SKNGRD
- Q:   2160 EA
-                `
-            },
-             { // Step 6 remains the same
-                title: "Step 6: Verify Details",
-                description: "IMPORTANT: Check that the Item number and Quantity on the screen match the actual pallet you picked up.",
-                scannerContent: `
- Wrk Order Pick
- Loc: 2L46B
- ID:  001620182280
- Itm: <span class="scanner-highlight">90787527</span>      <- Verify
- Lot: BLST FUS SKNGRD
- Q:   <span class="scanner-highlight">2160 EA</span>        <- Verify
-                `
-            },
-            { // Step 7 remains the same
-                title: "Step 7: Find Deposit Location",
-                description: "Press Enter. The screen will now show you the 'Deposit Location'. Take the pallet to this location (e.g., 2P17A).",
-                scannerContent: `
- Product Deposit
- Lod: 00300474002721350824
- Itm: 80374707
- Q:   8100 EA
- Loc: <span class="scanner-highlight">2P17A</span>          <- Go Here
-
- Scan Location to Deposit
-                `
-            },
-            { // Step 8 remains the same
-                title: "Step 8: Scan Location & Deposit",
-                description: "Once you arrive at the correct deposit location (e.g., 2P17A), scan the location label to confirm, then deposit the pallet.",
-                scannerContent: `
- Product Deposit
- Lod: 00300474002721350824
- Itm: 80374707
- Q:   8100 EA
- Loc: <span class="scanner-highlight">2P17A</span>          <- Scan this location label
-
- Deposit Complete!
-                `
-            },
-            { // Step 9 remains the same
-                title: "Step 9: Handling Overrides (If Needed)",
-                description: "If you can't deposit the pallet (e.g., location is full), press the 'F4' key to override.",
-                scannerContent: `
- Product Deposit
- Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>
-
- Cannot Deposit Here?
-                `
-            },
-            { // Step 10 remains the same
-                title: "Step 10: Select Override Reason",
-                description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.",
-                scannerContent: `
- Override Location
- Lod: 00100474091617976961
- Loc: 2L55B
- Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)
- Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location
-
- Press Enter
-                `
-            }
+             { title: "Step 1: Select Vehicle Type", description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: <span class="scanner-highlight">REACH2</span>\n Work Area:\n                ` },
+             { title: "Step 2: Leave Work Area Empty & Enter", description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: REACH2\n Work Area: <span class="scanner-highlight">[Leave Empty]</span>\n                ` },
+             { title: "Step 3: Choose Directed Work", description: "The 'Undirected Menu' will appear. Select option '8' for 'Directed Work Menu' and press Enter.", scannerContent: `\n Undirected Menu\n 1 Picking Menu        7 Yard Menu\n 2 Inventory Menu      <span class="scanner-highlight">8 Directed Work</span>\n 3 Receiving Menu      9 Labor Statistics\n 4 Shipping Menu\n 5 Production Menu\n 6 Cycle Count Menu\n Enter Option: <span class="scanner-highlight">8</span>\n                ` },
+             { title: "Step 4: Find the Source Location", description: "Wait for the system. It will show you the 'Source Location'. This is where you need to go to pick up the pallet.", scannerContent: `\n Pickup Product At\n Source Location: <span class="scanner-highlight">2L46B</span>\n\n Press Enter To Acknowledge\n                ` },
+             { title: "Step 5: Scan the ULID (Use the Scanner!)", description: "Go to the Source Location. Find the pallet and scan the ULID number printed on it using your SCAN GUN. The system should fill in the item details automatically. \n\n<span class='font-bold text-red-600'>IMPORTANT: Always use the scanner gun for accuracy and speed. DO NOT type the number manually unless absolutely necessary and approved by a supervisor.</span>", scannerContent: `\n Wrk Order Pick\n Loc: 2L46B\n ID: <span class="scanner-highlight">001620182280</span>   <- Scan This with Gun!\n Itm: 90787527\n Lot: BLST FUS SKNGRD\n Q:   2160 EA\n                ` },
+             { title: "Step 6: Verify Details", description: "IMPORTANT: Check that the Item number and Quantity on the screen match the actual pallet you picked up.", scannerContent: `\n Wrk Order Pick\n Loc: 2L46B\n ID:  001620182280\n Itm: <span class="scanner-highlight">90787527</span>      <- Verify\n Lot: BLST FUS SKNGRD\n Q:   <span class="scanner-highlight">2160 EA</span>        <- Verify\n                ` },
+             { title: "Step 7: Find Deposit Location", description: "Press Enter. The screen will now show you the 'Deposit Location'. Take the pallet to this location (e.g., 2P17A).", scannerContent: `\n Product Deposit\n Lod: 00300474002721350824\n Itm: 80374707\n Q:   8100 EA\n Loc: <span class="scanner-highlight">2P17A</span>          <- Go Here\n\n Scan Location to Deposit\n                ` },
+             { title: "Step 8: Scan Location & Deposit", description: "Once you arrive at the correct deposit location (e.g., 2P17A), scan the location label to confirm, then deposit the pallet.", scannerContent: `\n Product Deposit\n Lod: 00300474002721350824\n Itm: 80374707\n Q:   8100 EA\n Loc: <span class="scanner-highlight">2P17A</span>          <- Scan this location label\n\n Deposit Complete!\n                ` },
+             { title: "Step 9: Handling Overrides (If Needed)", description: "If you can't deposit the pallet (e.g., location is full), press the 'F4' key to override.", scannerContent: `\n Product Deposit\n Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>\n\n Cannot Deposit Here?\n                ` },
+             { title: "Step 10: Select Override Reason", description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.", scannerContent: `\n Override Location\n Lod: 00100474091617976961\n Loc: 2L55B\n Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)\n Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location\n\n Press Enter\n                ` }
         ];
 
-        const quizQuestions = [
-            // Original questions 1-4
-            {
-                question: "When you start, what's the first thing you need to choose on the screen?",
-                options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"],
-                correctAnswer: "Vehicle Type"
-            },
-            {
-                question: "After picking the vehicle, what menu option do you choose to get your task?",
-                options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"],
-                correctAnswer: "Option 8 (Directed Work)"
-            },
-            {
-                question: "What information does the system give you *before* you physically pick up the pallet?",
-                options: ["Deposit Location", "Item Quantity", "ULID Number", "Source Location"],
-                correctAnswer: "Source Location"
-            },
-            { // Updated question 4 wording slightly for clarity
-                question: "What specific number printed on the pallet itself should you input into the system?",
-                options: ["Item Number", "Lot Number", "ULID number", "Location Code"],
-                correctAnswer: "ULID number"
-            },
-            { // New question about scanning
-                question: "How should you normally enter the ULID number into the system?",
-                options: ["Scan it with the gun", "Type it manually", "Write it down first", "Ask a supervisor"],
-                correctAnswer: "Scan it with the gun"
-            },
-            { // Original question 5 (now 6)
-                question: "What key should you press if you get to the drop-off spot and the pallet won't fit or can't be placed there?",
-                options: ["Enter", "F1", "F2", "F4"],
-                correctAnswer: "F4"
-            },
-             { // Original question 6 (now 7)
-                question: "After pressing F4 for an override, which key helps you select the *reason* for the override?",
-                options: ["Enter", "F1", "F2", "F4"],
-                correctAnswer: "F2"
-            }
+        // Original quiz questions remain the same
+        const originalQuizQuestions = [
+            { question: "When you start, what's the first thing you need to choose on the screen?", options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"], correctAnswer: "Vehicle Type" },
+            { question: "After picking the vehicle, what menu option do you choose to get your task?", options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"], correctAnswer: "Option 8 (Directed Work)" },
+            { question: "What information does the system give you *before* you physically pick up the pallet?", options: ["Deposit Location", "Item Quantity", "ULID Number", "Source Location"], correctAnswer: "Source Location" },
+            { question: "What specific number printed on the pallet itself should you input into the system?", options: ["Item Number", "Lot Number", "ULID number", "Location Code"], correctAnswer: "ULID number" },
+            { question: "How should you normally enter the ULID number into the system?", options: ["Scan it with the gun", "Type it manually", "Write it down first", "Ask a supervisor"], correctAnswer: "Scan it with the gun" },
+            { question: "What key should you press if you get to the drop-off spot and the pallet won't fit or can't be placed there?", options: ["Enter", "F1", "F2", "F4"], correctAnswer: "F4" },
+            { question: "After pressing F4 for an override, which key helps you select the *reason* for the override?", options: ["Enter", "F1", "F2", "F4"], correctAnswer: "F2" }
         ];
 
         // --- State Variables ---
         let currentStep = 0;
         let currentQuestionIndex = 0;
+        let currentShuffledQuestions = [];
         let userAnswers = [];
         let score = 0;
-        let userName = ''; // Store user name
-        let employeeId = ''; // Store employee ID
+        let percentage = 0;
+        let passStatus = '';
+        let attemptCount = 0; // This will now store attempts loaded for the current day
+
+        // User Info
+        let firstName = '';
+        let lastName = '';
+        let xlcId = ''; // Renamed from employeeId
+        // Removed department variable
 
         // --- DOM Elements ---
         const welcomeScreen = document.getElementById('welcome-screen');
-        const userNameInput = document.getElementById('userName');
-        const employeeIdInput = document.getElementById('employeeId');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const xlcIdInput = document.getElementById('xlcId'); // Renamed
+        // Removed departmentInput reference
+
         const trainingContainer = document.getElementById('training-container');
         const stepContent = document.getElementById('step-content');
         const prevButton = document.getElementById('prev-button');
         const nextButton = document.getElementById('next-button');
         const quizButton = document.getElementById('quiz-button');
         const stepIndicator = document.getElementById('step-indicator');
+
         const quizContainer = document.getElementById('quiz-container');
         const quizQuestionDiv = document.getElementById('quiz-question');
+        const attemptIndicator = document.getElementById('attempt-indicator');
         const nextQuestionButton = document.getElementById('next-question-button');
         const submitQuizButton = document.getElementById('submit-quiz-button');
+
         const resultsScreen = document.getElementById('results-screen');
+        const resultsTitle = document.getElementById('results-title');
         const scoreDisplay = document.getElementById('score-display');
+        const resultsMessage = document.getElementById('results-message');
+        const resultsActions = document.getElementById('results-actions');
+        const retryQuizButton = document.getElementById('retry-quiz-button');
         const downloadCsvButton = document.getElementById('download-csv-button');
+        const downloadCsvButtonCert = document.getElementById('download-csv-button-cert');
+
+        const certificateScreen = document.getElementById('certificate-screen');
+        const certificateRecipient = document.getElementById('certificate-recipient');
+        const certificateDate = document.getElementById('certificate-date');
+
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
 
+        // --- Helper Functions ---
 
-        // --- Functions ---
+        // Fisher-Yates Shuffle (Unchanged)
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            const newArray = [...array];
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [newArray[currentIndex], newArray[randomIndex]] = [
+                    newArray[randomIndex], newArray[currentIndex]];
+            }
+            return newArray;
+        }
 
+        // Get current date string (Unchanged)
+        function getCurrentDateString(format = 'en-US') {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date().toLocaleDateString(format, options);
+        }
+
+        // Get current date and time (Unchanged)
+         function getCurrentDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
+            const time = now.toLocaleTimeString('en-US', { hour12: false }); // HH:MM:SS
+            return { date, time };
+        }
+
+        // Get current date as YYYY-MM-DD for storage key consistency
+        function getStorageDateString() {
+             const now = new Date();
+             const year = now.getFullYear();
+             const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+             const day = String(now.getDate()).padStart(2, '0');
+             return `${year}-${month}-${day}`;
+        }
+
+
+        // Show screen (Unchanged)
         function showScreen(screenToShow) {
-            // Hide all screens first
             welcomeScreen.classList.add('hidden');
             trainingContainer.classList.add('hidden');
             quizContainer.classList.add('hidden');
             resultsScreen.classList.add('hidden');
-            // Show the requested screen
+            certificateScreen.classList.add('hidden');
             screenToShow.classList.remove('hidden');
-             // Ensure body takes full height for centering content vertically
             document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center');
-
         }
+
+        // --- Core Logic Functions ---
 
         function startTraining() {
             // Get and validate user input
-            const name = userNameInput.value.trim();
-            const id = employeeIdInput.value.trim();
+            const fname = firstNameInput.value.trim();
+            const lname = lastNameInput.value.trim();
+            const id = xlcIdInput.value.trim(); // Changed input ID
 
-            if (!name || !id) {
-                showMessage("Please enter both your User Name and Employee ID.");
+            // Removed department validation
+            if (!fname || !lname || !id) {
+                showMessage("Please fill in all fields: First Name, Last Name, and XLC_ID.");
                 return;
             }
 
             // Store user info
-            userName = name;
-            employeeId = id;
+            firstName = fname;
+            lastName = lname;
+            xlcId = id; // Changed variable name
 
-            // Proceed with training
+            // --- Load Daily Attempt Count ---
+            // This logic runs when the user *starts* the training session
+            const currentDate = getStorageDateString();
+            const storageKey = `forkliftAttempts_${xlcId}`;
+            let attemptsToday = 0;
+
+            try {
+                const storedDataRaw = localStorage.getItem(storageKey);
+                if (storedDataRaw) {
+                    const storedData = JSON.parse(storedDataRaw);
+                    // Check if stored data is for today
+                    if (storedData.date === currentDate) {
+                        attemptsToday = storedData.attempts || 0;
+                    } else {
+                        // Data is old, reset for today
+                        localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 }));
+                    }
+                } else {
+                     // No data stored, initialize for today
+                     localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 }));
+                }
+            } catch (e) {
+                console.error("Could not access localStorage to load/set attempt data:", e);
+                showMessage("Warning: Could not track daily attempts. Using session attempts only.");
+                // Fallback: reset attemptCount for the session if localStorage fails
+                attemptsToday = 0;
+            }
+            attemptCount = attemptsToday; // Set the global attemptCount based on loaded/reset value
+            // --- End Daily Attempt Loading ---
+
+            // Proceed with training steps
             currentStep = 0;
             showScreen(trainingContainer);
             displayStep(currentStep);
         }
 
-        function displayStep(stepIndex) {
-            if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
+        // displayStep, nextStep, prevStep remain unchanged
 
+        function displayStep(stepIndex) {
+             if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
             const step = trainingSteps[stepIndex];
-            // Use innerHTML carefully; ensure content is controlled or sanitized if dynamic
             stepContent.innerHTML = `
                 <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2>
-                <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p> <div class="scanner-screen">${step.scannerContent.trim()}</div>
+                <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p>
+                <div class="scanner-screen">${step.scannerContent.trim()}</div>
             `;
-            stepContent.scrollTop = 0; // Scroll to top of content
-
-            // Update step indicator
+            stepContent.scrollTop = 0;
             stepIndicator.textContent = `Step ${stepIndex + 1} / ${trainingSteps.length}`;
-
-            // Update button states
             prevButton.disabled = stepIndex === 0;
             prevButton.classList.toggle('opacity-50', stepIndex === 0);
             prevButton.classList.toggle('cursor-not-allowed', stepIndex === 0);
-
             if (stepIndex === trainingSteps.length - 1) {
-                // Last step
                 nextButton.classList.add('hidden');
                 quizButton.classList.remove('hidden');
             } else {
                 nextButton.classList.remove('hidden');
                 quizButton.classList.add('hidden');
             }
-
-             // Add fade-in animation
             stepContent.classList.remove('fade-in');
-            void stepContent.offsetWidth; // Trigger reflow to restart animation
+            void stepContent.offsetWidth;
             stepContent.classList.add('fade-in');
         }
 
@@ -414,26 +430,59 @@
             }
         }
 
+
         function startQuiz() {
+            // --- Update and Check Daily Attempt Count ---
+            // This logic runs each time the user clicks "Start Quiz" or "Retry Quiz"
+            const currentAttemptNumber = attemptCount + 1; // Tentative attempt number
+
+            if (currentAttemptNumber > MAX_ATTEMPTS) {
+                showRetryLimitScreen(); // Show limit screen based on already loaded count
+                return;
+            }
+
+            // Increment the actual attempt count for this try
+            attemptCount = currentAttemptNumber;
+
+            // Update localStorage with the new attempt count for today
+            const currentDate = getStorageDateString();
+            const storageKey = `forkliftAttempts_${xlcId}`;
+            try {
+                 localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: attemptCount }));
+            } catch (e) {
+                 console.error("Could not update attempt count in localStorage:", e);
+                 // Continue quiz, but attempts might not persist correctly if localStorage fails
+            }
+            // --- End Daily Attempt Update ---
+
+
+            // Shuffle questions for this attempt
+            currentShuffledQuestions = shuffleArray(originalQuizQuestions);
             currentQuestionIndex = 0;
-            userAnswers = new Array(quizQuestions.length).fill(null); // Reset answers for the correct number of questions
+            userAnswers = new Array(currentShuffledQuestions.length).fill(null);
             score = 0;
+            percentage = 0;
+            passStatus = '';
+
+            // Update attempt indicator UI
+            attemptIndicator.textContent = `Attempt ${attemptCount} / ${MAX_ATTEMPTS}`;
+
             showScreen(quizContainer);
             displayQuestion(currentQuestionIndex);
-            // Initially show Next button, hide Submit button
             submitQuizButton.classList.add('hidden');
             nextQuestionButton.classList.remove('hidden');
         }
 
-        function displayQuestion(index) {
-            if (index < 0 || index >= quizQuestions.length) return;
+        // displayQuestion, selectAnswer, nextQuestion remain unchanged
 
-            const q = quizQuestions[index];
+         function displayQuestion(index) {
+            if (index < 0 || index >= currentShuffledQuestions.length) return;
+
+            const q = currentShuffledQuestions[index];
             let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p>`;
-            optionsHtml += '<div class="space-y-3">'; // Container for options
+            optionsHtml += '<div class="space-y-3">';
 
             q.options.forEach((option) => {
-                // Escape single quotes within the option text for the onclick handler
                 const escapedOption = option.replace(/'/g, "\\'");
                 const isSelected = userAnswers[index] === option;
                 optionsHtml += `
@@ -444,12 +493,11 @@
                     </div>
                 `;
             });
-             optionsHtml += '</div>'; // Close container
+             optionsHtml += '</div>';
 
             quizQuestionDiv.innerHTML = optionsHtml;
 
-             // Manage button visibility: Show Submit only on the last question
-             if(index === quizQuestions.length - 1) {
+             if(index === currentShuffledQuestions.length - 1) {
                  nextQuestionButton.classList.add('hidden');
                  submitQuizButton.classList.remove('hidden');
              } else {
@@ -457,54 +505,177 @@
                  submitQuizButton.classList.add('hidden');
              }
 
-             // Add fade-in animation
              quizQuestionDiv.classList.remove('fade-in');
-             void quizQuestionDiv.offsetWidth; // Trigger reflow
+             void quizQuestionDiv.offsetWidth;
              quizQuestionDiv.classList.add('fade-in');
         }
 
         function selectAnswer(questionIndex, answer) {
             userAnswers[questionIndex] = answer;
-            // Re-display the question to show the selection visually
             displayQuestion(questionIndex);
         }
 
         function nextQuestion() {
-             // Check if an answer was selected for the current question
             if (userAnswers[currentQuestionIndex] === null) {
                 showMessage("Please select an answer before proceeding.");
                 return;
             }
-
-            // Move to the next question if not the last one
-            if (currentQuestionIndex < quizQuestions.length - 1) {
+            if (currentQuestionIndex < currentShuffledQuestions.length - 1) {
                 currentQuestionIndex++;
                 displayQuestion(currentQuestionIndex);
             }
-            // Note: The logic to show the submit button on the last question is handled within displayQuestion
         }
 
 
         function submitQuiz() {
-             // Check if the last question was answered
             if (userAnswers[currentQuestionIndex] === null) {
                 showMessage("Please select an answer for the final question.");
                 return;
             }
 
-            // Calculate score
+            // Calculate score and percentage (Unchanged)
             score = 0;
             userAnswers.forEach((answer, index) => {
-                if (answer === quizQuestions[index].correctAnswer) {
+                if (answer === currentShuffledQuestions[index].correctAnswer) {
                     score++;
                 }
             });
+            percentage = Math.round((score / currentShuffledQuestions.length) * 100);
+            passStatus = percentage >= PASSING_PERCENTAGE ? 'Pass' : 'Fail';
 
-            // Display results
-            scoreDisplay.innerHTML = `User: <span class="font-bold">${userName}</span> (ID: <span class="font-bold">${employeeId}</span>)<br> You answered <span class="font-bold text-blue-600">${score}</span> out of <span class="font-bold">${quizQuestions.length}</span> questions correctly.`;
+            // Simulate Database Logging (calls updated logQuizResult)
+            logQuizResult();
+
+            // Display appropriate screen based on Pass/Fail and attempts
+            if (passStatus === 'Pass') {
+                displayCertificate();
+            } else {
+                 // Check attempt count again *after* this attempt is completed
+                if (attemptCount < MAX_ATTEMPTS) {
+                    displayFailScreen(false); // Show fail screen with retry option
+                } else {
+                    showRetryLimitScreen(); // Show retry limit screen (already hit max attempts)
+                }
+            }
+        }
+
+        // displayCertificate remains unchanged
+        function displayCertificate() {
+            certificateRecipient.textContent = `${firstName} ${lastName}`;
+            certificateDate.textContent = getCurrentDateString();
+            showScreen(certificateScreen);
+        }
+
+
+        function displayFailScreen(isRetryLimitReached) {
+            resultsTitle.textContent = "Quiz Attempt Failed";
+            // Updated score display to use xlcId and remove department
+            scoreDisplay.innerHTML = `
+                User: <span class="font-bold">${firstName} ${lastName}</span> (ID: ${xlcId})<br>
+                Attempt: <span class="font-bold">${attemptCount} / ${MAX_ATTEMPTS}</span> (Today)<br>
+                Score: <span class="font-bold">${score} / ${currentShuffledQuestions.length}</span><br>
+                Percentage: <span class="font-bold text-red-600">${percentage}%</span><br>
+                Status: <span class="font-bold text-red-600">Fail</span> (Required: ${PASSING_PERCENTAGE}%)
+            `;
+
+            if (isRetryLimitReached) {
+                resultsMessage.textContent = "You have reached the maximum number of quiz attempts for today. Please contact your supervisor if needed.";
+                retryQuizButton.classList.add('hidden'); // Hide retry button
+            } else {
+                 resultsMessage.textContent = `You need ${PASSING_PERCENTAGE}% to pass. Please review the material and try again. You have ${MAX_ATTEMPTS - attemptCount} attempt(s) remaining today.`;
+                 retryQuizButton.classList.remove('hidden'); // Show retry button
+            }
             showScreen(resultsScreen);
         }
 
+        // showRetryLimitScreen remains unchanged
+         function showRetryLimitScreen() {
+            displayFailScreen(true); // Call fail screen with retry limit flag
+        }
+
+
+        function logQuizResult() {
+            const { date, time } = getCurrentDateTime();
+            // Updated resultData object
+            const resultData = {
+                quizDate: date,
+                quizTime: time,
+                firstName: firstName,
+                lastName: lastName,
+                xlcId: xlcId, // Changed from employeeId
+                // department removed
+                quizScore: score,
+                quizPercentage: percentage,
+                passFail: passStatus,
+                attemptNumberToday: attemptCount // Clarified attempt context
+            };
+
+            // --- DATABASE SIMULATION ---
+            console.log("Quiz Result Data (Simulated Database Entry):", resultData);
+            try {
+                 // Store the latest result locally (optional), key updated
+                 localStorage.setItem(`lastResult_${xlcId}`, JSON.stringify(resultData));
+                 // console.log("Result saved to localStorage (for this browser only)."); // Less verbose logging
+            } catch (e) {
+                console.error("Could not save result to localStorage:", e);
+            }
+            // --- END DATABASE SIMULATION ---
+        }
+
+        function downloadResults() {
+             const { date, time } = getCurrentDateTime();
+             const timestamp = `${date} ${time}`;
+
+            // Updated CSV Header and Data Row
+            const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,AttemptToday\n";
+            const safeFirstName = `"${firstName.replace(/"/g, '""')}"`;
+            const safeLastName = `"${lastName.replace(/"/g, '""')}"`;
+            const safeXlcId = `"${xlcId.replace(/"/g, '""')}"`; // Changed variable
+
+            // Removed department, updated ID field, updated attempt context
+            const csvData = `"${date}","${time}",${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},"${passStatus}",${attemptCount}\n`;
+            const csvContent = csvHeader + csvData;
+
+            // Trigger download (logic unchanged, filename updated)
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                const dateStr = date;
+                // Updated filename
+                link.setAttribute("download", `Forklift_Quiz_${xlcId}_${dateStr}_Attempt${attemptCount}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                showMessage("CSV download is not supported in your browser.");
+            }
+        }
+
+        // downloadCertificate remains unchanged
+        function downloadCertificate() {
+            const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate');
+            if (html2canvas) {
+                 html2canvas(certificateElement, { scale: 2, useCORS: true, backgroundColor: '#fefce8' })
+                 .then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Forklift_Certificate_${firstName}_${lastName}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error("Error generating certificate image:", err);
+                    showMessage("Could not generate certificate image.");
+                });
+            } else {
+                 showMessage("Certificate download library (html2canvas) not loaded.");
+            }
+        }
+
+
+        // showMessage, closeMessageBox remain unchanged
          function showMessage(message) {
             messageText.textContent = message;
             messageBox.classList.remove('hidden');
@@ -514,59 +685,35 @@
             messageBox.classList.add('hidden');
         }
 
-        function downloadResults() {
-            // Get current timestamp
-            const timestamp = new Date().toLocaleString();
-
-            // Prepare CSV header and data row
-            const csvHeader = "UserName,EmployeeID,Score,TotalQuestions,Timestamp\n";
-            // Escape potential commas or quotes in user name/ID
-            const safeUserName = `"${userName.replace(/"/g, '""')}"`;
-            const safeEmployeeId = `"${employeeId.replace(/"/g, '""')}"`;
-            const csvData = `${safeUserName},${safeEmployeeId},${score},${quizQuestions.length},"${timestamp}"\n`;
-            const csvContent = csvHeader + csvData;
-
-            // Create a Blob object
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-
-            // Create a temporary link element
-            const link = document.createElement("a");
-            // Check if download attribute is supported (standard way)
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                // Create a filename including employee ID and date
-                const dateStr = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-                link.setAttribute("download", `Forklift_Quiz_${employeeId}_${dateStr}.csv`);
-                link.style.visibility = 'hidden'; // Hide the link
-                document.body.appendChild(link); // Append link to the body
-                link.click(); // Programmatically click the link to trigger download
-                document.body.removeChild(link); // Remove the link from the body
-                URL.revokeObjectURL(url); // Clean up the object URL
-            } else {
-                // Fallback or error message if download attribute is not supported
-                showMessage("CSV download is not directly supported in this browser/environment.");
-            }
-        }
-
-
+        // restartTraining updated
         function restartTraining() {
-            // Clear user info fields for the next user
-            userNameInput.value = '';
-            employeeIdInput.value = '';
-            userName = '';
-            employeeId = '';
+            // Clear input fields
+            firstNameInput.value = '';
+            lastNameInput.value = '';
+            xlcIdInput.value = ''; // Changed ID
+            // departmentInput removed
+
             // Reset state variables
+            firstName = '';
+            lastName = '';
+            xlcId = ''; // Changed variable
+            // department removed
             currentStep = 0;
             currentQuestionIndex = 0;
             userAnswers = [];
             score = 0;
-            // Show the welcome screen
+            percentage = 0;
+            passStatus = '';
+            attemptCount = 0; // Reset session attempt count (daily count logic is handled in startTraining)
+            currentShuffledQuestions = [];
+
+            // NOTE: We don't clear the daily attempt count from localStorage here.
+            // The logic in startTraining() handles checking the date and resetting if necessary.
+
             showScreen(welcomeScreen);
         }
 
         // --- Initial Setup ---
-        // Ensure welcome screen is shown initially
         showScreen(welcomeScreen);
 
     </script>
