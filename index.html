@@ -20,7 +20,7 @@
       @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
       .scanner-screen { font-family: monospace; background-color: #c8e6c9; color: #004d40; border: 4px solid #388e3c; padding: 15px; border-radius: 8px; min-height: 200px; white-space: pre; line-height: 1.4; overflow-x: auto; }
       .scanner-highlight { background-color: #fff59d; font-weight: bold; padding: 2px; border-radius: 3px; }
-      .quiz-option { cursor: pointer; transition: background-color 0.2s ease-in-out; border: 2px solid #d1d5db; /* Added default border */}
+      .quiz-option { cursor: pointer; transition: background-color 0.2s ease-in-out; border: 2px solid #d1d5db; }
       .quiz-option.selected { background-color: #bbdefb; border-color: #1976d2; }
       html, body { height: 100%; margin: 0; }
       body { font-family: 'Inter', sans-serif; }
@@ -34,17 +34,21 @@
       .certificate::before, .certificate::after { content: ''; position: absolute; width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 50%; z-index: -1; }
       .certificate::before { top: -25px; left: -25px; }
       .certificate::after { top: -25px; right: -25px; }
-       #local-results-table table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-       #local-results-table th, #local-results-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.85rem; }
-       #local-results-table th { background-color: #f2f2f2; }
-       #local-results-table tr:nth-child(even) { background-color: #f9f9f9; }
-       #local-results-table td.wrap { white-space: normal; word-break: break-word; }
+       #supervisor-results-table table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+       #supervisor-results-table th, #supervisor-results-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.85rem; }
+       #supervisor-results-table th { background-color: #f2f2f2; }
+       #supervisor-results-table tr:nth-child(even) { background-color: #f9f9f9; }
+       #supervisor-results-table td.wrap { white-space: normal; word-break: break-word; }
        .screen-container { position: relative; padding-top: 60px; }
        .logo-container { position: absolute; top: 1rem; right: 1rem; line-height: 1; text-align: right; }
        .logo-xlc { display: block; font-weight: 900; font-size: 2.25rem; letter-spacing: -0.025em; color: #000000; }
        .logo-services { display: block; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.2em; color: #4b5563; margin-top: -4px; }
-
     </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
     <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-3xl">
@@ -77,7 +81,7 @@
         </div>
 
         <div id="quiz-container" class="hidden screen-container">
-             <div class="flex justify-between items-center mb-3"> <h2 class="text-xl md:text-2xl font-bold text-gray-800">Knowledge Check</h2> <span id="attempt-indicator" class="text-sm font-medium text-gray-600 bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Attempt 1 / 3</span> </div>
+             <div class="flex justify-between items-center mb-3"> <h2 class="text-xl md:text-2xl font-bold text-gray-800">Knowledge Check</h2> </div>
             <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in"></div>
             <div class="text-center">
                  <button id="submit-quiz-button" onclick="submitQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out hidden"> Submit Answers </button>
@@ -90,8 +94,7 @@
             <div id="score-display" class="text-lg text-gray-700 mb-6 bg-red-100 border border-red-300 p-4 rounded-md"></div>
             <p id="results-message" class="text-gray-600 mb-6">Please review the training material again.</p>
             <div id="results-actions" class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                 <button onclick="startQuiz()" id="retry-quiz-button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Retry Quiz <span class="lucide ml-2">&#xe91b;</span> </button>
-                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Download This Result (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
                 <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Restart Training <span class="lucide ml-2">&#xe89b;</span> </button>
             </div>
         </div>
@@ -107,20 +110,26 @@
              </div>
              <div class="text-center mt-6">
                 <button onclick="downloadCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3"> Download Certificate (PNG) <span class="lucide ml-2">&#xe919;</span> </button>
-                 <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3"> Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                 <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3"> Download This Result (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
                  <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto"> Start New Training <span class="lucide ml-2">&#xe89b;</span> </button>
              </div>
         </div>
 
          <div id="supervisor-view" class="hidden fade-in screen-container">
-              <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 text-center">Supervisor View - Local Results</h2>
-             <p class="text-sm text-center text-red-600 mb-4"> <span class="font-bold">Important:</span> This view shows only the results recorded and stored locally within <span class="font-bold">this specific web browser</span>. It is NOT a central database of all user results. </p>
-             <div class="text-center mb-4 space-x-3">
-                 <button onclick="displayLocalResults()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow"> Load Local Results </button>
-                 <button onclick="downloadAllLocalResults()" id="download-all-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow hidden"> Download All Local Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
-                  <button onclick="clearAllLocalResults()" id="clear-all-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow hidden"> Clear Local Results <span class="lucide ml-2">&#xe9e1;</span> </button>
+             <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 text-center">Supervisor View - All Results</h2>
+             <p class="text-sm text-center text-red-600 mb-4"> <span class="font-bold">Requires Secure Implementation:</span> Accessing all results requires supervisor authentication and secure Firestore rules, which are not implemented in this example. </p>
+             <div id="supervisor-login-area" class="text-center mb-4 p-4 border rounded bg-gray-100">
+                 <p class="mb-2 font-semibold">Supervisor Login Required</p>
+                 <input type="email" id="supervisor-email" placeholder="Supervisor Email" class="px-2 py-1 border rounded mb-2">
+                 <input type="password" id="supervisor-password" placeholder="Password" class="px-2 py-1 border rounded mb-2">
+                 <button onclick="loginSupervisor()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded shadow">Login</button>
+                 <p id="supervisor-status" class="text-xs mt-2 text-gray-600">Status: Not Logged In</p>
              </div>
-             <div id="local-results-table" class="overflow-x-auto border border-gray-300 rounded-lg p-2 bg-gray-50 max-h-96 overflow-y-auto"> <p class="text-gray-500 text-center p-4">Click "Load Local Results" to view data stored in this browser.</p> </div>
+             <div class="text-center mb-4 space-x-3">
+                 <button onclick="fetchAllResults()" id="fetch-all-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow disabled:opacity-50" disabled> Fetch All Results (Requires Login) </button>
+                 <button onclick="downloadAllResults()" id="download-all-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow hidden"> Download All Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+             </div>
+             <div id="supervisor-results-table" class="overflow-x-auto border border-gray-300 rounded-lg p-2 bg-gray-50 max-h-96 overflow-y-auto"> <p class="text-gray-500 text-center p-4">Login and click "Fetch All Results" to view data.</p> </div>
               <div class="text-center mt-6"> <button onclick="restartTraining()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto"> Back to Welcome Screen <span class="lucide ml-2">&#xe89b;</span> </button> </div>
          </div>
 
@@ -129,15 +138,32 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     <script>
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAYdn17zrJgCvmartYmjTvRasY8LoWNsKA",
+          authDomain: "forklift-training-app-bb7c2.firebaseapp.com",
+          projectId: "forklift-training-app-bb7c2",
+          storageBucket: "forklift-training-app-bb7c2.appspot.com",
+          messagingSenderId: "283141747166",
+          appId: "1:283141747166:web:eb7ca8b7738e9b14a86d4f"
+        };
+        // --- End Firebase Configuration ---
+
+        // --- Initialize Firebase ---
+        let firestoreDb;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            firestoreDb = firebase.firestore();
+            console.log("Firebase initialized successfully using compat libraries.");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+        }
+
         // --- Configuration ---
         const PASSING_PERCENTAGE = 80;
-        const MAX_ATTEMPTS = 3;
-        const ALL_RESULTS_STORAGE_KEY = 'allForkliftQuizResults';
 
-        // --- Training Steps Data --- (Restored)
+        // --- Training Steps Data --- << RESTORED >>
         const trainingSteps = [
              { title: "Step 1: Select Vehicle Type", description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: <span class="scanner-highlight">REACH2</span>\n Work Area:\n                ` },
              { title: "Step 2: Leave Work Area Empty & Enter", description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: REACH2\n Work Area: <span class="scanner-highlight">[Leave Empty]</span>\n                ` },
@@ -150,8 +176,7 @@
              { title: "Step 9: Handling Overrides (If Needed)", description: "If you can't deposit the pallet (e.g., location is full), press the 'F4' key to override.", scannerContent: `\n Product Deposit\n Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>\n\n Cannot Deposit Here?\n                ` },
              { title: "Step 10: Select Override Reason", description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.", scannerContent: `\n Override Location\n Lod: 00100474091617976961\n Loc: 2L55B\n Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)\n Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location\n\n Press Enter\n                ` }
         ];
-
-        // --- Quiz Questions Data --- (Restored)
+        // --- Quiz Questions Data --- << RESTORED >>
         const originalQuizQuestions = [
             { question: "When you start, what's the first thing you need to choose on the screen?", options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"], correctAnswer: "Vehicle Type" },
             { question: "After picking the vehicle, what menu option do you choose to get your task?", options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"], correctAnswer: "Option 8 (Directed Work)" },
@@ -163,11 +188,13 @@
         ];
 
         // --- State Variables ---
-        let currentStep = 0, currentQuestionIndex = 0, score = 0, percentage = 0, attemptCount = 0;
+        let currentStep = 0, currentQuestionIndex = 0, score = 0, percentage = 0;
         let currentShuffledQuestions = [], userAnswers = [], incorrectQuestions = [];
         let firstName = '', lastName = '', xlcId = '', passStatus = '';
+        let isSupervisorLoggedIn = false;
 
         // --- DOM Elements ---
+        // (References remain the same)
         const welcomeScreen = document.getElementById('welcome-screen');
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
@@ -180,7 +207,6 @@
         const stepIndicator = document.getElementById('step-indicator');
         const quizContainer = document.getElementById('quiz-container');
         const quizQuestionDiv = document.getElementById('quiz-question');
-        const attemptIndicator = document.getElementById('attempt-indicator');
         const nextQuestionButton = document.getElementById('next-question-button');
         const submitQuizButton = document.getElementById('submit-quiz-button');
         const resultsScreen = document.getElementById('results-screen');
@@ -188,7 +214,6 @@
         const scoreDisplay = document.getElementById('score-display');
         const resultsMessage = document.getElementById('results-message');
         const resultsActions = document.getElementById('results-actions');
-        const retryQuizButton = document.getElementById('retry-quiz-button');
         const downloadCsvButton = document.getElementById('download-csv-button');
         const downloadCsvButtonCert = document.getElementById('download-csv-button-cert');
         const certificateScreen = document.getElementById('certificate-screen');
@@ -197,328 +222,137 @@
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
         const supervisorView = document.getElementById('supervisor-view');
-        const localResultsTableDiv = document.getElementById('local-results-table');
+        const supervisorStatus = document.getElementById('supervisor-status');
+        const fetchAllButton = document.getElementById('fetch-all-button');
+        const supervisorResultsTableDiv = document.getElementById('supervisor-results-table');
         const downloadAllButton = document.getElementById('download-all-button');
-        const clearAllButton = document.getElementById('clear-all-button');
 
 
         // --- Helper Functions ---
-        // (Full implementations included below for completeness)
         function shuffleArray(array) { let currentIndex = array.length, randomIndex; const newArray = [...array]; while (currentIndex !== 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--; [newArray[currentIndex], newArray[randomIndex]] = [ newArray[randomIndex], newArray[currentIndex]]; } return newArray; }
         function getCurrentDateString(format = 'en-US') { const options = { year: 'numeric', month: 'long', day: 'numeric' }; return new Date().toLocaleDateString(format, options); }
         function getCurrentDateTime() { const now = new Date(); const date = now.toLocaleDateString('en-CA'); const time = now.toLocaleTimeString('en-US', { hour12: false }); return { date, time }; }
-        function getStorageDateString() { const now = new Date(); const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const day = String(now.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; }
-        function showScreen(screenToShow) { if (!screenToShow) { console.error("showScreen called with null/undefined screen"); return; } welcomeScreen.classList.add('hidden'); trainingContainer.classList.add('hidden'); quizContainer.classList.add('hidden'); resultsScreen.classList.add('hidden'); certificateScreen.classList.add('hidden'); supervisorView.classList.add('hidden'); screenToShow.classList.remove('hidden'); document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center'); }
+        function showScreen(screenToShow) { if (!screenToShow) { console.error("showScreen called with null/undefined screen"); return; } welcomeScreen.classList.add('hidden'); trainingContainer.classList.add('hidden'); quizContainer.classList.add('hidden'); resultsScreen.classList.add('hidden'); certificateScreen.classList.add('hidden'); if(supervisorView) supervisorView.classList.add('hidden'); screenToShow.classList.remove('hidden'); document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center'); }
         function showMessage(message) { if(messageText && messageBox){ messageText.textContent = message; messageBox.classList.remove('hidden'); } else { console.error("Message box elements not found"); alert(message); } }
         function closeMessageBox() { if(messageBox) messageBox.classList.add('hidden'); }
         function downloadCertificate() { const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate'); if (typeof html2canvas !== 'undefined' && html2canvas && certificateElement) { html2canvas(certificateElement, { scale: 2, useCORS: true, backgroundColor: '#fefce8' }).then(canvas => { const link = document.createElement('a'); link.download = `Forklift_Certificate_${firstName}_${lastName}.png`; link.href = canvas.toDataURL('image/png'); link.click(); }).catch(err => { console.error("Error generating certificate image:", err); showMessage("Could not generate certificate image."); }); } else { showMessage("Certificate download library or element not found."); } }
-        function clearAllLocalResults() { if (confirm("Are you sure you want to permanently delete ALL locally stored quiz results from this browser? This cannot be undone.")) { try { localStorage.removeItem(ALL_RESULTS_STORAGE_KEY); console.log("All local results cleared."); displayLocalResults(); showMessage("All local results cleared successfully."); } catch (e) { console.error("Error clearing local results:", e); showMessage("Error clearing local results."); } } }
-        function downloadAllLocalResults() { try { const allResultsRaw = localStorage.getItem(ALL_RESULTS_STORAGE_KEY); const allResults = JSON.parse(allResultsRaw || '[]'); if (!Array.isArray(allResults) || allResults.length === 0) { showMessage("No local results found to download."); return; } const headers = ["QuizDate", "QuizTime", "FirstName", "LastName", "XLC_ID", "QuizScore", "QuizPercentage", "PassFail", "AttemptNumberToday", "IncorrectQuestions"]; let csvContent = headers.join(',') + '\n'; allResults.forEach(result => { const row = headers.map(header => { let value = result ? result[header] : ''; value = value ?? ''; if (header === 'IncorrectQuestions' && Array.isArray(value)) { value = value.join('; '); } const safeValue = `"${String(value).replace(/"/g, '""')}"`; return safeValue; }); csvContent += row.join(',') + '\n'; }); const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = getStorageDateString(); link.setAttribute("download", `All_Local_Forklift_Results_${dateStr}.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download is not supported in your browser."); } } catch (e) { console.error("Error generating or downloading all local results CSV:", e); showMessage("Error preparing download for all local results."); } }
-        function downloadResults() { const { date, time } = getCurrentDateTime(); const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,AttemptToday,IncorrectQuestions\n"; const safeFirstName = `"${firstName.replace(/"/g, '""')}"`; const safeLastName = `"${lastName.replace(/"/g, '""')}"`; const safeXlcId = `"${xlcId.replace(/"/g, '""')}"`; const incorrectQuestionsStr = `"${incorrectQuestions.join('; ').replace(/"/g, '""')}"`; const csvData = `"${date}","${time}",${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},"${passStatus}",${attemptCount},${incorrectQuestionsStr}\n`; const csvContent = csvHeader + csvData; const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = date; link.setAttribute("download", `Forklift_Quiz_${xlcId}_${dateStr}_Attempt${attemptCount}.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download is not supported in your browser."); } }
+        function downloadResults() { const { date, time } = getCurrentDateTime(); const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,IncorrectQuestions\n"; const safeFirstName = `"${firstName.replace(/"/g, '""')}"`; const safeLastName = `"${lastName.replace(/"/g, '""')}"`; const safeXlcId = `"${xlcId.replace(/"/g, '""')}"`; const incorrectQuestionsStr = `"${incorrectQuestions.join('; ').replace(/"/g, '""')}"`; const csvData = `"${date}","${time}",${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},"${passStatus}","N/A",${incorrectQuestionsStr}\n`; const csvContent = csvHeader + csvData; const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = date; link.setAttribute("download", `Forklift_Quiz_${xlcId}_${dateStr}_Result.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download is not supported in your browser."); } }
 
 
         // --- Core Logic Functions ---
         function startTraining() {
-            console.log("startTraining called"); // DEBUG LOG
+            console.log("startTraining called");
+            if (!firstNameInput || !lastNameInput || !xlcIdInput) { showMessage("Error: Input fields could not be found."); console.error("Input elements missing in startTraining"); return; }
             const fname = firstNameInput.value.trim();
             const lname = lastNameInput.value.trim();
             const id = xlcIdInput.value.trim();
-            if (!fname || !lname || !id) {
-                showMessage("Please fill in all fields: First Name, Last Name, and XLC_ID."); return;
-            }
+            if (!fname || !lname || !id) { showMessage("Please fill in all fields: First Name, Last Name, and XLC_ID."); return; }
             firstName = fname; lastName = lname; xlcId = id;
-            const currentDate = getStorageDateString();
-            const storageKey = `forkliftAttempts_${xlcId}`;
-            let attemptsToday = 0;
-            try {
-                const storedDataRaw = localStorage.getItem(storageKey);
-                if (storedDataRaw) {
-                    // Add check for invalid JSON before parsing
-                    let storedData = null;
-                    try { storedData = JSON.parse(storedDataRaw); } catch (parseError) { console.error("Invalid JSON in localStorage for attempts, resetting.", parseError); storedData = null;}
-
-                    if (storedData && storedData.date === currentDate) { // Check storedData exists and date matches
-                        attemptsToday = storedData.attempts || 0;
-                    } else {
-                        // Reset if date mismatch or data invalid/null
-                        localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 }));
-                    }
-                } else {
-                     localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 }));
-                }
-            } catch (e) {
-                console.error("Error processing localStorage in startTraining:", e);
-                 try { localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 })); } catch (e2) {/* ignore */}
-                showMessage("Warning: Could not track daily attempts accurately. Using session attempts.");
-                attemptsToday = 0; // Fallback
-            }
-            attemptCount = attemptsToday;
             currentStep = 0;
-            showScreen(trainingContainer);
-            displayStep(currentStep);
+            console.log("User details set:", firstName, lastName, xlcId);
+            const targetScreen = document.getElementById('training-container');
+             if(targetScreen){ console.log("Attempting to show training container..."); showScreen(targetScreen); displayStep(currentStep); }
+             else { console.error("Training container element not found!"); showMessage("Error: Could not load training steps."); }
         }
 
         function displayStep(stepIndex) {
-            // console.log("displayStep called for index:", stepIndex); // DEBUG LOG
              if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
-            const step = trainingSteps[stepIndex];
-             if (!step || !step.title || !step.description || typeof step.scannerContent === 'undefined') {
-                 console.error("Invalid step data for index:", stepIndex, step);
-                 stepContent.innerHTML = '<p class="text-red-500">Error loading step content.</p>';
-                 return;
-             }
-            // Use restored content
-            stepContent.innerHTML = `
-                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2>
-                <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p>
-                <div class="scanner-screen">${step.scannerContent.trim()}</div>`;
+             if (!stepContent) { console.error("stepContent element not found!"); return; }
+             const step = trainingSteps[stepIndex];
+             if (!step || !step.title || !step.description || typeof step.scannerContent === 'undefined') { console.error("Invalid step data for index:", stepIndex, step); stepContent.innerHTML = '<p class="text-red-500">Error loading step content.</p>'; return; }
             stepIndicator.textContent = `Step ${stepIndex + 1} / ${trainingSteps.length}`;
             prevButton.disabled = stepIndex === 0;
             prevButton.classList.toggle('opacity-50', stepIndex === 0);
             prevButton.classList.toggle('cursor-not-allowed', stepIndex === 0);
-            if (stepIndex === trainingSteps.length - 1) {
-                nextButton.classList.add('hidden'); quizButton.classList.remove('hidden');
-            } else {
-                nextButton.classList.remove('hidden'); quizButton.classList.add('hidden');
-            }
+            if (stepIndex === trainingSteps.length - 1) { nextButton.classList.add('hidden'); quizButton.classList.remove('hidden'); }
+            else { nextButton.classList.remove('hidden'); quizButton.classList.add('hidden'); }
             stepContent.classList.remove('fade-in');
-            void stepContent.offsetWidth;
-            stepContent.classList.add('fade-in');
+            void stepContent.offsetWidth; stepContent.classList.add('fade-in');
+            stepContent.innerHTML = ` <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2> <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p> <div class="scanner-screen">${step.scannerContent.trim()}</div>`;
         }
 
-        function nextStep() {
-            console.log("nextStep called"); // DEBUG LOG
-            if (currentStep < trainingSteps.length - 1) { currentStep++; displayStep(currentStep); }
-        }
-        function prevStep() {
-            console.log("prevStep called"); // DEBUG LOG
-            if (currentStep > 0) { currentStep--; displayStep(currentStep); }
-        }
+        function nextStep() { console.log("nextStep called"); if (currentStep < trainingSteps.length - 1) { currentStep++; displayStep(currentStep); } }
+        function prevStep() { console.log("prevStep called"); if (currentStep > 0) { currentStep--; displayStep(currentStep); } }
 
         function startQuiz() {
-            console.log("startQuiz called"); // DEBUG LOG
-            const currentAttemptNumber = attemptCount + 1;
-            if (currentAttemptNumber > MAX_ATTEMPTS) { showRetryLimitScreen(); return; }
-            attemptCount = currentAttemptNumber;
-            const currentDate = getStorageDateString();
-            const storageKey = `forkliftAttempts_${xlcId}`;
-            try { localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: attemptCount })); }
-            catch (e) { console.error("Could not update attempt count in localStorage:", e); }
+            console.log("startQuiz called");
             currentShuffledQuestions = shuffleArray(originalQuizQuestions);
             currentQuestionIndex = 0;
             userAnswers = new Array(currentShuffledQuestions.length).fill(null);
             incorrectQuestions = []; score = 0; percentage = 0; passStatus = '';
-            attemptIndicator.textContent = `Attempt ${attemptCount} / ${MAX_ATTEMPTS}`;
-            showScreen(quizContainer);
-            displayQuestion(currentQuestionIndex);
-            submitQuizButton.classList.add('hidden'); nextQuestionButton.classList.remove('hidden');
+            // Ensure quizContainer exists before showing
+            const targetScreen = document.getElementById('quiz-container');
+            if (targetScreen) {
+                 showScreen(targetScreen);
+                 displayQuestion(currentQuestionIndex);
+                 submitQuizButton.classList.add('hidden'); nextQuestionButton.classList.remove('hidden');
+            } else {
+                 console.error("Quiz container element not found!");
+                 showMessage("Error: Could not start the quiz.");
+            }
         }
 
         function displayQuestion(index) {
-            // console.log("displayQuestion called for index:", index); // DEBUG LOG
              if (index < 0 || index >= currentShuffledQuestions.length) return;
-            const q = currentShuffledQuestions[index];
-             if (!q || !q.question || !Array.isArray(q.options)) {
-                 console.error("Invalid question data for index:", index, q);
-                 quizQuestionDiv.innerHTML = '<p class="text-red-500">Error loading question.</p>';
-                 return;
-             }
+             // Ensure quizQuestionDiv exists
+             if (!quizQuestionDiv) { console.error("quizQuestionDiv element not found!"); return; }
+             const q = currentShuffledQuestions[index];
+             if (!q || !q.question || !Array.isArray(q.options)) { console.error("Invalid question data for index:", index, q); quizQuestionDiv.innerHTML = '<p class="text-red-500">Error loading question.</p>'; return; }
             let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p><div class="space-y-3">`;
-            q.options.forEach((option) => { // Use restored options
+            q.options.forEach((option) => {
                 const escapedOption = String(option).replace(/'/g, "\\'");
                 const isSelected = userAnswers[index] === option;
-                // Ensure onclick is properly formatted
                 optionsHtml += `<div class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${index}, '${escapedOption}')"> ${option} </div>`;
             });
             optionsHtml += '</div>';
-            quizQuestionDiv.innerHTML = optionsHtml;
+            quizQuestionDiv.innerHTML = optionsHtml; // Set the innerHTML
+            // Check button existence before modifying classList
             if(index === currentShuffledQuestions.length - 1) {
-                 nextQuestionButton.classList.add('hidden'); submitQuizButton.classList.remove('hidden');
+                 if(nextQuestionButton) nextQuestionButton.classList.add('hidden');
+                 if(submitQuizButton) submitQuizButton.classList.remove('hidden');
             } else {
-                 nextQuestionButton.classList.remove('hidden'); submitQuizButton.classList.add('hidden');
+                 if(nextQuestionButton) nextQuestionButton.classList.remove('hidden');
+                 if(submitQuizButton) submitQuizButton.classList.add('hidden');
             }
             quizQuestionDiv.classList.remove('fade-in');
-            void quizQuestionDiv.offsetWidth;
-            quizQuestionDiv.classList.add('fade-in');
+            void quizQuestionDiv.offsetWidth; quizQuestionDiv.classList.add('fade-in');
         }
 
-        function selectAnswer(questionIndex, answer) {
-            // console.log(`selectAnswer called: Q${questionIndex}, A:"${answer}"`); // DEBUG LOG
-            userAnswers[questionIndex] = answer;
-            displayQuestion(questionIndex); // Re-render to show selection
-        }
-
-        function nextQuestion() {
-            console.log("nextQuestion called"); // DEBUG LOG
-            if (userAnswers[currentQuestionIndex] === null) { showMessage("Please select an answer before proceeding."); return; }
-            if (currentQuestionIndex < currentShuffledQuestions.length - 1) { currentQuestionIndex++; displayQuestion(currentQuestionIndex); }
-        }
+        function selectAnswer(questionIndex, answer) { userAnswers[questionIndex] = answer; displayQuestion(questionIndex); }
+        function nextQuestion() { if (userAnswers[currentQuestionIndex] === null) { showMessage("Please select an answer before proceeding."); return; } if (currentQuestionIndex < currentShuffledQuestions.length - 1) { currentQuestionIndex++; displayQuestion(currentQuestionIndex); } }
 
         function submitQuiz() {
-            console.log("submitQuiz called"); // DEBUG LOG
-            try { // Add try...catch around the whole function logic
-                if (userAnswers[currentQuestionIndex] === null) {
-                    showMessage("Please select an answer for the final question."); return;
-                }
+            console.log("submitQuiz called");
+            if (!submitQuizButton) { console.error("Submit button not found"); return; } // Check button exists
+            submitQuizButton.disabled = true; submitQuizButton.textContent = 'Submitting...';
+            try {
+                if (userAnswers[currentQuestionIndex] === null) { showMessage("Please select an answer for the final question."); submitQuizButton.disabled = false; submitQuizButton.textContent = 'Submit Answers'; return; }
                 score = 0; incorrectQuestions = [];
-                userAnswers.forEach((answer, index) => {
-                    if (currentShuffledQuestions[index] && answer === currentShuffledQuestions[index].correctAnswer) { score++; }
-                    else if (currentShuffledQuestions[index] && currentShuffledQuestions[index].question) { incorrectQuestions.push(currentShuffledQuestions[index].question); }
-                    else { console.warn("Issue comparing answer for question index:", index); }
-                });
-
+                userAnswers.forEach((answer, index) => { if (currentShuffledQuestions[index] && answer === currentShuffledQuestions[index].correctAnswer) { score++; } else if (currentShuffledQuestions[index] && currentShuffledQuestions[index].question) { incorrectQuestions.push(currentShuffledQuestions[index].question); } else { console.warn("Issue comparing answer for question index:", index); } });
                 percentage = currentShuffledQuestions.length > 0 ? Math.round((score / currentShuffledQuestions.length) * 100) : 0;
                 passStatus = percentage >= PASSING_PERCENTAGE ? 'Pass' : 'Fail';
-                console.log(`Quiz submitted: Score=${score}, Percentage=${percentage}, Status=${passStatus}`); // DEBUG LOG
-
-                logQuizResult(); // Log result before potentially switching screen
-
-                console.log("Determining next screen..."); // DEBUG LOG
-                if (passStatus === 'Pass') {
-                    console.log("Calling displayCertificate..."); // DEBUG LOG
-                    displayCertificate();
-                } else {
-                    console.log("Checking attempt count for failure screen..."); // DEBUG LOG
-                    if (attemptCount < MAX_ATTEMPTS) {
-                        console.log("Calling displayFailScreen (Retry available)..."); // DEBUG LOG
-                        displayFailScreen(false);
-                    } else {
-                        console.log("Calling showRetryLimitScreen..."); // DEBUG LOG
-                        showRetryLimitScreen();
-                    }
-                }
-            } catch (error) {
-                console.error("Error occurred in submitQuiz:", error);
-                showMessage("An unexpected error occurred while submitting the quiz. Please try again or contact support.");
-            }
+                console.log(`Quiz submitted: Score=${score}, Percentage=${percentage}, Status=${passStatus}`);
+                logQuizResult().then(() => { console.log("logQuizResult finished."); if (passStatus === 'Pass') { displayCertificate(); } else { displayFailScreen(false); } submitQuizButton.disabled = false; submitQuizButton.textContent = 'Submit Answers'; }).catch(error => { console.error("Error logging result:", error); showMessage("Could not save results to database, but showing outcome."); if (passStatus === 'Pass') { displayCertificate(); } else { displayFailScreen(false); } submitQuizButton.disabled = false; submitQuizButton.textContent = 'Submit Answers'; });
+            } catch (error) { console.error("Error occurred in submitQuiz:", error); showMessage("An unexpected error occurred while submitting the quiz."); submitQuizButton.disabled = false; submitQuizButton.textContent = 'Submit Answers'; }
         }
 
-        function displayCertificate() {
-            console.log("displayCertificate called"); // DEBUG LOG
-             if (!certificateScreen || !certificateRecipient || !certificateDate) {
-                 console.error("Certificate screen elements not found!"); return;
-             }
-            certificateRecipient.textContent = `${firstName} ${lastName}`;
-            certificateDate.textContent = getCurrentDateString();
-            showScreen(certificateScreen);
-        }
+        function displayCertificate() { console.log("displayCertificate called"); if (!certificateScreen || !certificateRecipient || !certificateDate) { console.error("Certificate screen elements not found!"); return; } certificateRecipient.textContent = `${firstName} ${lastName}`; certificateDate.textContent = getCurrentDateString(); showScreen(certificateScreen); }
+        function displayFailScreen(isRetryLimitReached) { console.log(`displayFailScreen called`); if (!resultsScreen || !resultsTitle || !scoreDisplay || !resultsMessage) { console.error("Results screen elements not found!"); return; } resultsTitle.textContent = "Quiz Results"; scoreDisplay.innerHTML = ` User: <span class="font-bold">${firstName} ${lastName}</span> (ID: ${xlcId})<br> Score: <span class="font-bold">${score} / ${currentShuffledQuestions.length}</span><br> Percentage: <span class="font-bold text-red-600">${percentage}%</span><br> Status: <span class="font-bold text-red-600">Fail</span> (Required: ${PASSING_PERCENTAGE}%) `; resultsMessage.textContent = `You did not meet the required score of ${PASSING_PERCENTAGE}%. Please review the training material carefully before restarting.`; showScreen(resultsScreen); }
 
-        function displayFailScreen(isRetryLimitReached) {
-             console.log(`displayFailScreen called with isRetryLimitReached=${isRetryLimitReached}`); // DEBUG LOG
-             if (!resultsScreen || !resultsTitle || !scoreDisplay || !resultsMessage || !retryQuizButton) {
-                 console.error("Results screen elements not found!"); return;
-             }
-            resultsTitle.textContent = "Quiz Attempt Failed";
-            scoreDisplay.innerHTML = `
-                User: <span class="font-bold">${firstName} ${lastName}</span> (ID: ${xlcId})<br>
-                Attempt: <span class="font-bold">${attemptCount} / ${MAX_ATTEMPTS}</span> (Today)<br>
-                Score: <span class="font-bold">${score} / ${currentShuffledQuestions.length}</span><br>
-                Percentage: <span class="font-bold text-red-600">${percentage}%</span><br>
-                Status: <span class="font-bold text-red-600">Fail</span> (Required: ${PASSING_PERCENTAGE}%)
-            `;
-            if (isRetryLimitReached) {
-                resultsMessage.textContent = "You have reached the maximum number of quiz attempts for today. Please contact your supervisor if needed.";
-                retryQuizButton.classList.add('hidden');
-            } else {
-                 resultsMessage.textContent = `You need ${PASSING_PERCENTAGE}% to pass. Please review the material and try again. You have ${MAX_ATTEMPTS - attemptCount} attempt(s) remaining today.`;
-                 retryQuizButton.classList.remove('hidden');
-            }
-            showScreen(resultsScreen);
-        }
-        function showRetryLimitScreen() { console.log("showRetryLimitScreen called"); displayFailScreen(true); }
+        function logQuizResult() { console.log("logQuizResult called"); return new Promise((resolve, reject) => { if (typeof firestoreDb === 'undefined' || !firestoreDb) { const errorMsg = "Firestore not initialized!"; console.error(errorMsg); showMessage("Error: Cannot connect to database."); reject(new Error(errorMsg)); return; } const { date, time } = getCurrentDateTime(); const resultData = { quizDate: date, quizTime: time, firstName: firstName, lastName: lastName, xlcId: xlcId, quizScore: score, quizPercentage: percentage, passFail: passStatus, incorrectQuestions: incorrectQuestions, timestamp: firebase.firestore.FieldValue.serverTimestamp() }; console.log("Adding document to Firestore:", resultData); firestoreDb.collection("quizResults").add(resultData) .then((docRef) => { console.log("Document written with ID: ", docRef.id); showMessage("Quiz results saved."); resolve(docRef); }) .catch((error) => { console.error("Error adding document: ", error); showMessage("Error saving quiz results."); reject(error); }); }); }
 
-        function logQuizResult() {
-            console.log("logQuizResult called"); // DEBUG LOG
-            const { date, time } = getCurrentDateTime();
-            const resultData = { quizDate: date, quizTime: time, firstName: firstName, lastName: lastName, xlcId: xlcId, quizScore: score, quizPercentage: percentage, passFail: passStatus, attemptNumberToday: attemptCount, incorrectQuestions: incorrectQuestions };
-            console.log("Quiz Result Data (Simulated Database Entry):", resultData);
-            try {
-                 let allResults = [];
-                 const allResultsRaw = localStorage.getItem(ALL_RESULTS_STORAGE_KEY);
-                 if (allResultsRaw) {
-                     // Add try-catch specifically for parsing allResults
-                     try {
-                         const parsed = JSON.parse(allResultsRaw);
-                         if (Array.isArray(parsed)) { allResults = parsed; }
-                         else { console.warn("Stored results data is not an array, resetting."); }
-                     } catch (parseError) {
-                         console.error("Invalid JSON in localStorage for all results, resetting.", parseError);
-                         allResults = []; // Reset if parsing fails
-                     }
-                 }
-                 allResults.push(resultData);
-                 localStorage.setItem(ALL_RESULTS_STORAGE_KEY, JSON.stringify(allResults));
-                 localStorage.setItem(`lastResult_${xlcId}`, JSON.stringify(resultData));
-            } catch (e) { console.error("Could not save result to localStorage:", e); showMessage("Warning: Could not save result data locally."); }
-        }
-
-        // --- Supervisor View Functions ---
-        function showSupervisorView() { console.log("showSupervisorView called"); showScreen(supervisorView); localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">Click "Load Local Results" to view data stored in this browser.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); }
-        function displayLocalResults() {
-            console.log("displayLocalResults called");
-             if (!localResultsTableDiv || !downloadAllButton || !clearAllButton) {
-                 console.error("Supervisor view elements not found!"); return;
-             }
-            try {
-                const allResultsRaw = localStorage.getItem(ALL_RESULTS_STORAGE_KEY);
-                if (!allResultsRaw) { localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">No results found in this browser\'s local storage.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); return; }
-
-                let allResults = [];
-                // Add try-catch specifically for parsing allResults
-                try {
-                     const parsed = JSON.parse(allResultsRaw);
-                     if (Array.isArray(parsed)) { allResults = parsed; }
-                     else { console.warn("Stored results data is not an array, resetting."); }
-                } catch (parseError) {
-                     console.error("Invalid JSON in localStorage for all results, resetting.", parseError);
-                     allResults = []; // Reset if parsing fails
-                }
-
-
-                if (allResults.length === 0) { localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">No results found or data format error.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); return; }
-
-                let tableHtml = '<table><thead><tr>';
-                const headers = allResults.length > 0 && allResults[0] ? Object.keys(allResults[0]) : [];
-                if (headers.length === 0) { localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">Stored results have no data fields.</p>'; return; }
-                headers.forEach(header => { const displayHeader = header.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); tableHtml += `<th>${displayHeader}</th>`; });
-                tableHtml += '</tr></thead><tbody>';
-                allResults.forEach(result => {
-                    if (typeof result !== 'object' || result === null) return;
-                    tableHtml += '<tr>';
-                    headers.forEach(header => {
-                        let cellData = result[header];
-                        if (header === 'incorrectQuestions' && Array.isArray(cellData)) { cellData = cellData.join('; '); }
-                        const tdClass = (header === 'incorrectQuestions' && String(cellData).length > 50) ? ' class="wrap"' : '';
-                        tableHtml += `<td${tdClass}>${cellData ?? ''}</td>`;
-                    });
-                    tableHtml += '</tr>';
-                });
-                tableHtml += '</tbody></table>';
-                localResultsTableDiv.innerHTML = tableHtml;
-                downloadAllButton.classList.remove('hidden'); clearAllButton.classList.remove('hidden');
-            } catch (e) { console.error("Error loading or parsing local results:", e); localResultsTableDiv.innerHTML = '<p class="text-red-500 text-center p-4">Error loading results from local storage. Data might be corrupted.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); }
-        }
+        // --- Supervisor View Functions (Placeholders) ---
+        function showSupervisorView() { console.log("showSupervisorView called"); isSupervisorLoggedIn = false; if (supervisorStatus) supervisorStatus.textContent = "Status: Not Logged In"; if (fetchAllButton) fetchAllButton.disabled = true; if (downloadAllButton) downloadAllButton.classList.add('hidden'); if (supervisorResultsTableDiv) supervisorResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">Login and click "Fetch All Results" to view data.</p>'; if (supervisorView) showScreen(supervisorView); else console.error("Supervisor view element not found"); }
+        function loginSupervisor() { console.log("loginSupervisor called (Placeholder)"); showMessage("Supervisor login functionality needs to be implemented using Firebase Authentication."); }
+        function fetchAllResults() { console.log("fetchAllResults called (Placeholder)"); if (!isSupervisorLoggedIn) { showMessage("You must be logged in as a supervisor."); return; } if (!firestoreDb) { showMessage("Database connection not available."); return; } showMessage("Fetching all results... (Requires Secure Firestore Rules)"); supervisorResultsTableDiv.innerHTML = '<p class="text-center p-4">Loading...</p>'; downloadAllButton.classList.add('hidden'); firestoreDb.collection("quizResults").get().then((querySnapshot) => { const allResults = []; querySnapshot.forEach((doc) => { allResults.push({ id: doc.id, ...doc.data() }); }); console.log(`Fetched ${allResults.length} results.`); if (allResults.length === 0) { supervisorResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">No results found.</p>'; return; } let tableHtml = '<table><thead><tr>'; const headers = allResults.length > 0 && allResults[0] ? Object.keys(allResults[0]) : []; if (headers.length === 0) { supervisorResultsTableDiv.innerHTML = '<p>No data fields.</p>'; return; } headers.forEach(header => { const displayHeader = header.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); tableHtml += `<th>${displayHeader}</th>`; }); tableHtml += '</tr></thead><tbody>'; allResults.forEach(result => { if (typeof result !== 'object' || result === null) return; tableHtml += '<tr>'; headers.forEach(header => { let cellData = result[header]; if (header === 'timestamp' && cellData && typeof cellData.toDate === 'function') { cellData = cellData.toDate().toLocaleString(); } else if (header === 'incorrectQuestions' && Array.isArray(cellData)) { cellData = cellData.join('; '); } const tdClass = (header === 'incorrectQuestions' && String(cellData).length > 50) ? ' class="wrap"' : ''; tableHtml += `<td${tdClass}>${cellData ?? ''}</td>`; }); tableHtml += '</tr>'; }); tableHtml += '</tbody></table>'; supervisorResultsTableDiv.innerHTML = tableHtml; downloadAllButton.classList.remove('hidden'); }).catch((error) => { console.error("Error fetching all results: ", error); if (error.code === 'permission-denied') { supervisorResultsTableDiv.innerHTML = '<p class="text-red-500 text-center p-4">Permission Denied.</p>'; showMessage("Permission Denied."); } else { supervisorResultsTableDiv.innerHTML = '<p class="text-red-500 text-center p-4">Error fetching results.</p>'; showMessage("Error fetching results."); } downloadAllButton.classList.add('hidden'); }); }
+        function downloadAllResults() { console.log("downloadAllResults called (Placeholder)"); if (!isSupervisorLoggedIn) { showMessage("You must be logged in."); return; } if (!firestoreDb) { showMessage("Database connection not available."); return; } showMessage("Preparing download..."); firestoreDb.collection("quizResults").orderBy("timestamp", "desc").get().then((querySnapshot) => { const allResults = []; querySnapshot.forEach((doc) => { allResults.push({ id: doc.id, ...doc.data() }); }); if (allResults.length === 0) { showMessage("No results found."); return; } const headers = ["QuizDate", "QuizTime", "FirstName", "LastName", "XLC_ID", "QuizScore", "QuizPercentage", "PassFail", "IncorrectQuestions", "Timestamp"]; let csvContent = headers.join(',') + '\n'; allResults.forEach(result => { const row = headers.map(header => { let value = result[header] ?? ''; if (header === 'Timestamp' && value && typeof value.toDate === 'function') { value = value.toDate().toISOString(); } else if (header === 'IncorrectQuestions' && Array.isArray(value)) { value = value.join('; '); } const safeValue = `"${String(value).replace(/"/g, '""')}"`; return safeValue; }); csvContent += row.join(',') + '\n'; }); const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = new Date().toLocaleDateString('en-CA'); link.setAttribute("download", `All_Forklift_Results_${dateStr}.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download not supported."); } }).catch((error) => { console.error("Error fetching data for download: ", error); showMessage("Error fetching data for download."); }); }
 
         // --- restartTraining ---
-        function restartTraining() {
-            console.log("restartTraining called");
-            firstNameInput.value = ''; lastNameInput.value = ''; xlcIdInput.value = '';
-            firstName = ''; lastName = ''; xlcId = '';
-            currentStep = 0; currentQuestionIndex = 0; userAnswers = []; score = 0;
-            percentage = 0; passStatus = ''; attemptCount = 0;
-            currentShuffledQuestions = []; incorrectQuestions = [];
-            showScreen(welcomeScreen);
-        }
+        function restartTraining() { console.log("restartTraining called"); if (firstNameInput) firstNameInput.value = ''; if (lastNameInput) lastNameInput.value = ''; if (xlcIdInput) xlcIdInput.value = ''; firstName = ''; lastName = ''; xlcId = ''; currentStep = 0; currentQuestionIndex = 0; userAnswers = []; score = 0; percentage = 0; passStatus = ''; currentShuffledQuestions = []; incorrectQuestions = []; isSupervisorLoggedIn = false; if (welcomeScreen) showScreen(welcomeScreen); }
 
         // --- Initial Setup ---
-        // Add checks for essential elements before showing the initial screen
-         if (!welcomeScreen || !trainingContainer || !quizContainer || !resultsScreen || !certificateScreen || !supervisorView || !messageBox || !firstNameInput || !lastNameInput || !xlcIdInput || !stepContent || !quizQuestionDiv || !scoreDisplay || !certificateRecipient) {
-             console.error("Initialization failed: One or more required elements not found in the DOM. Check IDs.");
-             document.body.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Error: Application could not initialize correctly. Required elements are missing.</p>';
-         } else {
-            console.log("Application initialized successfully.");
-            showScreen(welcomeScreen); // Start at the welcome screen only if elements are found
-         }
+        function initializeApp() { const essentialElements = [ welcomeScreen, firstNameInput, lastNameInput, xlcIdInput, trainingContainer, stepContent, prevButton, nextButton, quizButton, stepIndicator, quizContainer, quizQuestionDiv, nextQuestionButton, submitQuizButton, resultsScreen, resultsTitle, scoreDisplay, resultsMessage, resultsActions, downloadCsvButton, certificateScreen, certificateRecipient, certificateDate, downloadCsvButtonCert, messageBox, messageText, supervisorView, supervisorStatus, fetchAllButton, supervisorResultsTableDiv, downloadAllButton ]; const missingElement = essentialElements.find(el => !el); if (missingElement) { const missingId = essentialElements.reduce((acc, el, index) => { if (!el && !acc) { const ids = ['welcome-screen', 'firstName', 'lastName', 'xlcId', 'training-container', 'step-content', 'prev-button', 'next-button', 'quiz-button', 'step-indicator', 'quiz-container', 'quiz-question', 'next-question-button', 'submit-quiz-button', 'results-screen', 'results-title', 'score-display', 'results-message', 'results-actions', 'download-csv-button', 'certificate-screen', 'certificate-recipient', 'certificate-date', 'download-csv-button-cert', 'message-box', 'message-text', 'supervisor-view', 'supervisor-status', 'fetch-all-button', 'supervisor-results-table', 'download-all-button']; return ids[index] || 'Unknown Element'; } return acc; }, null); console.error(`Initialization failed: Element with ID '${missingId || 'Unknown'}' not found.`); document.body.innerHTML = `<p style="color: red; text-align: center; padding: 20px;">Error: Application could not initialize correctly. Element '${missingId || 'Unknown'}' is missing.</p>`; return false; } console.log("All essential application elements found."); return true; }
+        document.addEventListener('DOMContentLoaded', (event) => { console.log("DOM fully loaded"); if (typeof firestoreDb !== 'undefined' && initializeApp()) { console.log("App initialized."); showScreen(welcomeScreen); } else if (typeof firestoreDb === 'undefined') { console.error("Firestore DB not initialized."); if (messageText && messageBox) { showMessage("Error: Cannot connect to the database service."); } else { alert("Error: Cannot connect to the database service."); } } else { console.error("DOM element check failed."); } });
 
     </script>
 
