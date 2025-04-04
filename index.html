@@ -7,197 +7,126 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
       @font-face {
         font-family: 'LucideIcons';
          /* Correct: Lucide font via unpkg */
         src: url(https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf) format('truetype');
       }
-      .lucide {
-        font-family: 'LucideIcons';
-        font-style: normal;
-        font-weight: normal;
-        font-variant: normal;
-        text-rendering: auto;
-        line-height: 1;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-      }
-      /* Basic animation */
-      .fade-in {
-        animation: fadeIn 0.5s ease-in-out;
-      }
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-      /* Style for simulated scanner screen */
-      .scanner-screen {
-        font-family: monospace;
-        background-color: #c8e6c9; /* Light green background */
-        color: #004d40; /* Dark green text */
-        border: 4px solid #388e3c; /* Darker green border */
-        padding: 15px;
-        border-radius: 8px;
-        min-height: 200px;
-        white-space: pre; /* Preserve whitespace and line breaks */
-        line-height: 1.4;
-        overflow-x: auto; /* Allow horizontal scroll if needed */
-      }
-      .scanner-highlight {
-        background-color: #fff59d; /* Yellow highlight */
-        font-weight: bold;
-        padding: 2px;
-        border-radius: 3px;
-      }
-       /* Style for quiz options */
-      .quiz-option {
-        cursor: pointer;
-        transition: background-color 0.2s ease-in-out;
-      }
-      .quiz-option.selected {
-        background-color: #bbdefb; /* Light blue when selected */
-        border-color: #1976d2;
-      }
-      /* Ensure body takes full height */
-      html, body {
-        height: 100%;
-        margin: 0;
-      }
-      body {
-         font-family: 'Inter', sans-serif; /* Apply Inter font */
-      }
-      /* Certificate Styling - Unchanged */
-      .certificate {
-        border: 10px solid #facc15; /* Yellow-400 */
-        background-color: #fefce8; /* Yellow-50 */
-        padding: 2rem 3rem;
-        text-align: center;
-        max-width: 600px;
-        margin: auto;
-        position: relative;
-        border-radius: 15px; /* Rounded corners */
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-      }
+      /* Styles remain the same... */
+      .lucide { font-family: 'LucideIcons'; font-style: normal; font-weight: normal; font-variant: normal; text-rendering: auto; line-height: 1; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+      .fade-in { animation: fadeIn 0.5s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      .scanner-screen { font-family: monospace; background-color: #c8e6c9; color: #004d40; border: 4px solid #388e3c; padding: 15px; border-radius: 8px; min-height: 200px; white-space: pre; line-height: 1.4; overflow-x: auto; }
+      .scanner-highlight { background-color: #fff59d; font-weight: bold; padding: 2px; border-radius: 3px; }
+      .quiz-option { cursor: pointer; transition: background-color 0.2s ease-in-out; border: 2px solid #d1d5db; /* Added default border */}
+      .quiz-option.selected { background-color: #bbdefb; border-color: #1976d2; }
+      html, body { height: 100%; margin: 0; }
+      body { font-family: 'Inter', sans-serif; }
+      .certificate { border: 10px solid #facc15; background-color: #fefce8; padding: 2rem 3rem; text-align: center; max-width: 600px; margin: auto; position: relative; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
       .certificate h2 { font-size: 1.8rem; font-weight: bold; color: #1f2937; margin-bottom: 0.5rem; letter-spacing: 1px; }
       .certificate .subtitle { font-size: 1.1rem; font-weight: 600; color: #ca8a04; margin-bottom: 2rem; text-transform: uppercase; }
       .certificate .recipient-name { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; border-bottom: 2px solid #facc15; display: inline-block; padding-bottom: 0.5rem; }
       .certificate .acknowledgment { font-size: 0.9rem; color: #4b5563; margin-bottom: 2.5rem; }
       .certificate .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; }
       .certificate .date { font-size: 0.9rem; color: #4b5563; }
-      .certificate .logo { font-size: 2.5rem; font-weight: bold; color: #1f2937; line-height: 1; }
-      .certificate .logo span { display: block; font-size: 0.8rem; font-weight: normal; letter-spacing: 2px; color: #4b5563; }
       .certificate::before, .certificate::after { content: ''; position: absolute; width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 50%; z-index: -1; }
       .certificate::before { top: -25px; left: -25px; }
       .certificate::after { top: -25px; right: -25px; }
+       #local-results-table table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+       #local-results-table th, #local-results-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.85rem; }
+       #local-results-table th { background-color: #f2f2f2; }
+       #local-results-table tr:nth-child(even) { background-color: #f9f9f9; }
+       #local-results-table td.wrap { white-space: normal; word-break: break-word; }
+       .screen-container { position: relative; padding-top: 60px; }
+       .logo-container { position: absolute; top: 1rem; right: 1rem; line-height: 1; text-align: right; }
+       .logo-xlc { display: block; font-weight: 900; font-size: 2.25rem; letter-spacing: -0.025em; color: #000000; }
+       .logo-services { display: block; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.2em; color: #4b5563; margin-top: -4px; }
 
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
-    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-2xl">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-3xl">
 
-        <div id="welcome-screen" class="fade-in">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center">Forklift Point Transfer Training</h1>
+        <div class="logo-container">
+            <span class="logo-xlc">XLC</span>
+            <span class="logo-services">SERVICES</span>
+        </div>
+
+        <div id="welcome-screen" class="fade-in screen-container">
+             <button onclick="showSupervisorView()" class="absolute top-4 left-4 text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded shadow">Supervisor View</button>
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center pt-8">Forklift Point Transfer Training</h1>
             <p class="text-gray-600 mb-6 text-center">Learn the steps for using the scanner for directed work orders. Please enter your details below.</p>
             <div class="space-y-4 max-w-md mx-auto">
-                <div>
-                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label>
-                    <input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name:</label>
-                    <input type="text" id="lastName" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                <div>
-                    <label for="xlcId" class="block text-sm font-medium text-gray-700 mb-1">XLC_ID:</label>
-                    <input type="text" id="xlcId" name="xlcId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                </div>
-                 </div>
-            <div class="text-center mt-6">
-                <button onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
-                    Start Training <span class="lucide ml-2">&#xea3c;</span> </button>
+                <div> <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label> <input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"> </div>
+                <div> <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name:</label> <input type="text" id="lastName" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"> </div>
+                <div> <label for="xlcId" class="block text-sm font-medium text-gray-700 mb-1">XLC_ID:</label> <input type="text" id="xlcId" name="xlcId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"> </div>
             </div>
+            <div class="text-center mt-6"> <button onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto"> Start Training <span class="lucide ml-2">&#xea3c;</span> </button> </div>
         </div>
 
-        <div id="training-container" class="hidden">
+        <div id="training-container" class="hidden screen-container">
             <div id="step-content" class="mb-6 fade-in"></div>
             <div class="flex justify-between items-center mt-6">
-                <button id="prev-button" onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center" disabled>
-                    <span class="lucide mr-2">&#xea3a;</span> Prev </button>
+                <button id="prev-button" onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center" disabled> <span class="lucide mr-2">&#xea3a;</span> Prev </button>
                 <span id="step-indicator" class="text-sm text-gray-500">Step 1 / X</span>
-                <button id="next-button" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center">
-                    Next <span class="lucide ml-2">&#xea3c;</span> </button>
-                <button id="quiz-button" onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out hidden">
-                    Start Quiz <span class="lucide ml-2">&#xea3c;</span> </button>
+                <button id="next-button" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center"> Next <span class="lucide ml-2">&#xea3c;</span> </button>
+                <button id="quiz-button" onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out hidden"> Start Quiz <span class="lucide ml-2">&#xea3c;</span> </button>
             </div>
         </div>
 
-        <div id="quiz-container" class="hidden">
-             <div class="flex justify-between items-center mb-3">
-                 <h2 class="text-xl md:text-2xl font-bold text-gray-800">Knowledge Check</h2>
-                 <span id="attempt-indicator" class="text-sm font-medium text-gray-600 bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Attempt 1 / 3</span>
-             </div>
-            <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in">
-                </div>
+        <div id="quiz-container" class="hidden screen-container">
+             <div class="flex justify-between items-center mb-3"> <h2 class="text-xl md:text-2xl font-bold text-gray-800">Knowledge Check</h2> <span id="attempt-indicator" class="text-sm font-medium text-gray-600 bg-yellow-100 text-yellow-800 px-2 py-1 rounded">Attempt 1 / 3</span> </div>
+            <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in"></div>
             <div class="text-center">
-                 <button id="submit-quiz-button" onclick="submitQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out hidden">
-                    Submit Answers
-                </button>
-                 <button id="next-question-button" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
-                    Next Question <span class="lucide ml-2">&#xea3c;</span> </button>
+                 <button id="submit-quiz-button" onclick="submitQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out hidden"> Submit Answers </button>
+                 <button id="next-question-button" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out"> Next Question <span class="lucide ml-2">&#xea3c;</span> </button>
             </div>
         </div>
 
-        <div id="results-screen" class="hidden text-center fade-in">
+        <div id="results-screen" class="hidden text-center fade-in screen-container">
             <h2 id="results-title" class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Quiz Results</h2>
-            <div id="score-display" class="text-lg text-gray-700 mb-6 bg-red-100 border border-red-300 p-4 rounded-md">
-                </div>
+            <div id="score-display" class="text-lg text-gray-700 mb-6 bg-red-100 border border-red-300 p-4 rounded-md"></div>
             <p id="results-message" class="text-gray-600 mb-6">Please review the training material again.</p>
             <div id="results-actions" class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
-                 <button onclick="startQuiz()" id="retry-quiz-button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
-                    Retry Quiz <span class="lucide ml-2">&#xe91b;</span> </button>
-                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
-                    Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
-                <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
-                    Restart Training <span class="lucide ml-2">&#xe89b;</span> </button>
+                 <button onclick="startQuiz()" id="retry-quiz-button" class="bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Retry Quiz <span class="lucide ml-2">&#xe91b;</span> </button>
+                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto"> Restart Training <span class="lucide ml-2">&#xe89b;</span> </button>
             </div>
         </div>
 
-         <div id="certificate-screen" class="hidden fade-in">
+         <div id="certificate-screen" class="hidden fade-in screen-container">
              <div class="certificate">
                  <h2>CERTIFICATE</h2>
                  <p class="subtitle">OF COMPLETION</p>
                  <p class="subtitle" style="margin-bottom: 1rem;">POINT TRANSFER TRAINING</p>
                  <div id="certificate-recipient" class="recipient-name">Recipient Name</div>
-                 <p class="acknowledgment">
-                     in acknowledgment of successful completion<br>of the Point Transfer Training
-                 </p>
-                 <div class="footer">
-                     <div id="certificate-date" class="date">[Date]</div>
-                     <div class="logo">XLC <span>SERVICES</span></div>
-                 </div>
+                 <p class="acknowledgment"> in acknowledgment of successful completion<br>of the Point Transfer Training </p>
+                 <div class="footer"> <div id="certificate-date" class="date">[Date]</div> </div>
              </div>
              <div class="text-center mt-6">
-                <button onclick="downloadCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
-                    Download Certificate (PNG) <span class="lucide ml-2">&#xe919;</span> </button>
-                 <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
-                    Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
-                 <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
-                    Start New Training <span class="lucide ml-2">&#xe89b;</span> </button>
+                <button onclick="downloadCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3"> Download Certificate (PNG) <span class="lucide ml-2">&#xe919;</span> </button>
+                 <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3"> Download Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                 <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto"> Start New Training <span class="lucide ml-2">&#xe89b;</span> </button>
              </div>
         </div>
 
+         <div id="supervisor-view" class="hidden fade-in screen-container">
+              <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 text-center">Supervisor View - Local Results</h2>
+             <p class="text-sm text-center text-red-600 mb-4"> <span class="font-bold">Important:</span> This view shows only the results recorded and stored locally within <span class="font-bold">this specific web browser</span>. It is NOT a central database of all user results. </p>
+             <div class="text-center mb-4 space-x-3">
+                 <button onclick="displayLocalResults()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow"> Load Local Results </button>
+                 <button onclick="downloadAllLocalResults()" id="download-all-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow hidden"> Download All Local Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                  <button onclick="clearAllLocalResults()" id="clear-all-button" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow hidden"> Clear Local Results <span class="lucide ml-2">&#xe9e1;</span> </button>
+             </div>
+             <div id="local-results-table" class="overflow-x-auto border border-gray-300 rounded-lg p-2 bg-gray-50 max-h-96 overflow-y-auto"> <p class="text-gray-500 text-center p-4">Click "Load Local Results" to view data stored in this browser.</p> </div>
+              <div class="text-center mt-6"> <button onclick="restartTraining()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto"> Back to Welcome Screen <span class="lucide ml-2">&#xe89b;</span> </button> </div>
+         </div>
 
         <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
-            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
-                <p id="message-text" class="mb-4 text-gray-700"></p>
-                <button onclick="closeMessageBox()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
-                    OK
-                </button>
-            </div>
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center"> <p id="message-text" class="mb-4 text-gray-700"></p> <button onclick="closeMessageBox()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out"> OK </button> </div>
         </div>
-
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -206,8 +135,9 @@
         // --- Configuration ---
         const PASSING_PERCENTAGE = 80;
         const MAX_ATTEMPTS = 3;
+        const ALL_RESULTS_STORAGE_KEY = 'allForkliftQuizResults';
 
-        // Training steps remain the same
+        // --- Training Steps Data --- (Restored)
         const trainingSteps = [
              { title: "Step 1: Select Vehicle Type", description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: <span class="scanner-highlight">REACH2</span>\n Work Area:\n                ` },
              { title: "Step 2: Leave Work Area Empty & Enter", description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: REACH2\n Work Area: <span class="scanner-highlight">[Leave Empty]</span>\n                ` },
@@ -221,7 +151,7 @@
              { title: "Step 10: Select Override Reason", description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.", scannerContent: `\n Override Location\n Lod: 00100474091617976961\n Loc: 2L55B\n Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)\n Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location\n\n Press Enter\n                ` }
         ];
 
-        // Original quiz questions remain the same
+        // --- Quiz Questions Data --- (Restored)
         const originalQuizQuestions = [
             { question: "When you start, what's the first thing you need to choose on the screen?", options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"], correctAnswer: "Vehicle Type" },
             { question: "After picking the vehicle, what menu option do you choose to get your task?", options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"], correctAnswer: "Option 8 (Directed Work)" },
@@ -233,41 +163,26 @@
         ];
 
         // --- State Variables ---
-        let currentStep = 0;
-        let currentQuestionIndex = 0;
-        let currentShuffledQuestions = [];
-        let userAnswers = [];
-        let score = 0;
-        let percentage = 0;
-        let passStatus = '';
-        let attemptCount = 0; // This will now store attempts loaded for the current day
-
-        // User Info
-        let firstName = '';
-        let lastName = '';
-        let xlcId = ''; // Renamed from employeeId
-        // Removed department variable
+        let currentStep = 0, currentQuestionIndex = 0, score = 0, percentage = 0, attemptCount = 0;
+        let currentShuffledQuestions = [], userAnswers = [], incorrectQuestions = [];
+        let firstName = '', lastName = '', xlcId = '', passStatus = '';
 
         // --- DOM Elements ---
         const welcomeScreen = document.getElementById('welcome-screen');
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
-        const xlcIdInput = document.getElementById('xlcId'); // Renamed
-        // Removed departmentInput reference
-
+        const xlcIdInput = document.getElementById('xlcId');
         const trainingContainer = document.getElementById('training-container');
         const stepContent = document.getElementById('step-content');
         const prevButton = document.getElementById('prev-button');
         const nextButton = document.getElementById('next-button');
         const quizButton = document.getElementById('quiz-button');
         const stepIndicator = document.getElementById('step-indicator');
-
         const quizContainer = document.getElementById('quiz-container');
         const quizQuestionDiv = document.getElementById('quiz-question');
         const attemptIndicator = document.getElementById('attempt-indicator');
         const nextQuestionButton = document.getElementById('next-question-button');
         const submitQuizButton = document.getElementById('submit-quiz-button');
-
         const resultsScreen = document.getElementById('results-screen');
         const resultsTitle = document.getElementById('results-title');
         const scoreDisplay = document.getElementById('score-display');
@@ -276,140 +191,95 @@
         const retryQuizButton = document.getElementById('retry-quiz-button');
         const downloadCsvButton = document.getElementById('download-csv-button');
         const downloadCsvButtonCert = document.getElementById('download-csv-button-cert');
-
         const certificateScreen = document.getElementById('certificate-screen');
         const certificateRecipient = document.getElementById('certificate-recipient');
         const certificateDate = document.getElementById('certificate-date');
-
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
+        const supervisorView = document.getElementById('supervisor-view');
+        const localResultsTableDiv = document.getElementById('local-results-table');
+        const downloadAllButton = document.getElementById('download-all-button');
+        const clearAllButton = document.getElementById('clear-all-button');
+
 
         // --- Helper Functions ---
+        // (Full implementations included below for completeness)
+        function shuffleArray(array) { let currentIndex = array.length, randomIndex; const newArray = [...array]; while (currentIndex !== 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--; [newArray[currentIndex], newArray[randomIndex]] = [ newArray[randomIndex], newArray[currentIndex]]; } return newArray; }
+        function getCurrentDateString(format = 'en-US') { const options = { year: 'numeric', month: 'long', day: 'numeric' }; return new Date().toLocaleDateString(format, options); }
+        function getCurrentDateTime() { const now = new Date(); const date = now.toLocaleDateString('en-CA'); const time = now.toLocaleTimeString('en-US', { hour12: false }); return { date, time }; }
+        function getStorageDateString() { const now = new Date(); const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const day = String(now.getDate()).padStart(2, '0'); return `${year}-${month}-${day}`; }
+        function showScreen(screenToShow) { if (!screenToShow) { console.error("showScreen called with null/undefined screen"); return; } welcomeScreen.classList.add('hidden'); trainingContainer.classList.add('hidden'); quizContainer.classList.add('hidden'); resultsScreen.classList.add('hidden'); certificateScreen.classList.add('hidden'); supervisorView.classList.add('hidden'); screenToShow.classList.remove('hidden'); document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center'); }
+        function showMessage(message) { if(messageText && messageBox){ messageText.textContent = message; messageBox.classList.remove('hidden'); } else { console.error("Message box elements not found"); alert(message); } }
+        function closeMessageBox() { if(messageBox) messageBox.classList.add('hidden'); }
+        function downloadCertificate() { const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate'); if (typeof html2canvas !== 'undefined' && html2canvas && certificateElement) { html2canvas(certificateElement, { scale: 2, useCORS: true, backgroundColor: '#fefce8' }).then(canvas => { const link = document.createElement('a'); link.download = `Forklift_Certificate_${firstName}_${lastName}.png`; link.href = canvas.toDataURL('image/png'); link.click(); }).catch(err => { console.error("Error generating certificate image:", err); showMessage("Could not generate certificate image."); }); } else { showMessage("Certificate download library or element not found."); } }
+        function clearAllLocalResults() { if (confirm("Are you sure you want to permanently delete ALL locally stored quiz results from this browser? This cannot be undone.")) { try { localStorage.removeItem(ALL_RESULTS_STORAGE_KEY); console.log("All local results cleared."); displayLocalResults(); showMessage("All local results cleared successfully."); } catch (e) { console.error("Error clearing local results:", e); showMessage("Error clearing local results."); } } }
+        function downloadAllLocalResults() { try { const allResultsRaw = localStorage.getItem(ALL_RESULTS_STORAGE_KEY); const allResults = JSON.parse(allResultsRaw || '[]'); if (!Array.isArray(allResults) || allResults.length === 0) { showMessage("No local results found to download."); return; } const headers = ["QuizDate", "QuizTime", "FirstName", "LastName", "XLC_ID", "QuizScore", "QuizPercentage", "PassFail", "AttemptNumberToday", "IncorrectQuestions"]; let csvContent = headers.join(',') + '\n'; allResults.forEach(result => { const row = headers.map(header => { let value = result ? result[header] : ''; value = value ?? ''; if (header === 'IncorrectQuestions' && Array.isArray(value)) { value = value.join('; '); } const safeValue = `"${String(value).replace(/"/g, '""')}"`; return safeValue; }); csvContent += row.join(',') + '\n'; }); const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = getStorageDateString(); link.setAttribute("download", `All_Local_Forklift_Results_${dateStr}.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download is not supported in your browser."); } } catch (e) { console.error("Error generating or downloading all local results CSV:", e); showMessage("Error preparing download for all local results."); } }
+        function downloadResults() { const { date, time } = getCurrentDateTime(); const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,AttemptToday,IncorrectQuestions\n"; const safeFirstName = `"${firstName.replace(/"/g, '""')}"`; const safeLastName = `"${lastName.replace(/"/g, '""')}"`; const safeXlcId = `"${xlcId.replace(/"/g, '""')}"`; const incorrectQuestionsStr = `"${incorrectQuestions.join('; ').replace(/"/g, '""')}"`; const csvData = `"${date}","${time}",${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},"${passStatus}",${attemptCount},${incorrectQuestionsStr}\n`; const csvContent = csvHeader + csvData; const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = date; link.setAttribute("download", `Forklift_Quiz_${xlcId}_${dateStr}_Attempt${attemptCount}.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download is not supported in your browser."); } }
 
-        // Fisher-Yates Shuffle (Unchanged)
-        function shuffleArray(array) {
-            let currentIndex = array.length, randomIndex;
-            const newArray = [...array];
-            while (currentIndex !== 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [newArray[currentIndex], newArray[randomIndex]] = [
-                    newArray[randomIndex], newArray[currentIndex]];
-            }
-            return newArray;
-        }
-
-        // Get current date string (Unchanged)
-        function getCurrentDateString(format = 'en-US') {
-            const options = { year: 'numeric', month: 'long', day: 'numeric' };
-            return new Date().toLocaleDateString(format, options);
-        }
-
-        // Get current date and time (Unchanged)
-         function getCurrentDateTime() {
-            const now = new Date();
-            const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD
-            const time = now.toLocaleTimeString('en-US', { hour12: false }); // HH:MM:SS
-            return { date, time };
-        }
-
-        // Get current date as YYYY-MM-DD for storage key consistency
-        function getStorageDateString() {
-             const now = new Date();
-             const year = now.getFullYear();
-             const month = String(now.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-             const day = String(now.getDate()).padStart(2, '0');
-             return `${year}-${month}-${day}`;
-        }
-
-
-        // Show screen (Unchanged)
-        function showScreen(screenToShow) {
-            welcomeScreen.classList.add('hidden');
-            trainingContainer.classList.add('hidden');
-            quizContainer.classList.add('hidden');
-            resultsScreen.classList.add('hidden');
-            certificateScreen.classList.add('hidden');
-            screenToShow.classList.remove('hidden');
-            document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center');
-        }
 
         // --- Core Logic Functions ---
-
         function startTraining() {
-            // Get and validate user input
+            console.log("startTraining called"); // DEBUG LOG
             const fname = firstNameInput.value.trim();
             const lname = lastNameInput.value.trim();
-            const id = xlcIdInput.value.trim(); // Changed input ID
-
-            // Removed department validation
+            const id = xlcIdInput.value.trim();
             if (!fname || !lname || !id) {
-                showMessage("Please fill in all fields: First Name, Last Name, and XLC_ID.");
-                return;
+                showMessage("Please fill in all fields: First Name, Last Name, and XLC_ID."); return;
             }
-
-            // Store user info
-            firstName = fname;
-            lastName = lname;
-            xlcId = id; // Changed variable name
-
-            // --- Load Daily Attempt Count ---
-            // This logic runs when the user *starts* the training session
+            firstName = fname; lastName = lname; xlcId = id;
             const currentDate = getStorageDateString();
             const storageKey = `forkliftAttempts_${xlcId}`;
             let attemptsToday = 0;
-
             try {
                 const storedDataRaw = localStorage.getItem(storageKey);
                 if (storedDataRaw) {
-                    const storedData = JSON.parse(storedDataRaw);
-                    // Check if stored data is for today
-                    if (storedData.date === currentDate) {
+                    // Add check for invalid JSON before parsing
+                    let storedData = null;
+                    try { storedData = JSON.parse(storedDataRaw); } catch (parseError) { console.error("Invalid JSON in localStorage for attempts, resetting.", parseError); storedData = null;}
+
+                    if (storedData && storedData.date === currentDate) { // Check storedData exists and date matches
                         attemptsToday = storedData.attempts || 0;
                     } else {
-                        // Data is old, reset for today
+                        // Reset if date mismatch or data invalid/null
                         localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 }));
                     }
                 } else {
-                     // No data stored, initialize for today
                      localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 }));
                 }
             } catch (e) {
-                console.error("Could not access localStorage to load/set attempt data:", e);
-                showMessage("Warning: Could not track daily attempts. Using session attempts only.");
-                // Fallback: reset attemptCount for the session if localStorage fails
-                attemptsToday = 0;
+                console.error("Error processing localStorage in startTraining:", e);
+                 try { localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: 0 })); } catch (e2) {/* ignore */}
+                showMessage("Warning: Could not track daily attempts accurately. Using session attempts.");
+                attemptsToday = 0; // Fallback
             }
-            attemptCount = attemptsToday; // Set the global attemptCount based on loaded/reset value
-            // --- End Daily Attempt Loading ---
-
-            // Proceed with training steps
+            attemptCount = attemptsToday;
             currentStep = 0;
             showScreen(trainingContainer);
             displayStep(currentStep);
         }
 
-        // displayStep, nextStep, prevStep remain unchanged
-
         function displayStep(stepIndex) {
+            // console.log("displayStep called for index:", stepIndex); // DEBUG LOG
              if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
             const step = trainingSteps[stepIndex];
+             if (!step || !step.title || !step.description || typeof step.scannerContent === 'undefined') {
+                 console.error("Invalid step data for index:", stepIndex, step);
+                 stepContent.innerHTML = '<p class="text-red-500">Error loading step content.</p>';
+                 return;
+             }
+            // Use restored content
             stepContent.innerHTML = `
                 <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2>
                 <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p>
-                <div class="scanner-screen">${step.scannerContent.trim()}</div>
-            `;
-            stepContent.scrollTop = 0;
+                <div class="scanner-screen">${step.scannerContent.trim()}</div>`;
             stepIndicator.textContent = `Step ${stepIndex + 1} / ${trainingSteps.length}`;
             prevButton.disabled = stepIndex === 0;
             prevButton.classList.toggle('opacity-50', stepIndex === 0);
             prevButton.classList.toggle('cursor-not-allowed', stepIndex === 0);
             if (stepIndex === trainingSteps.length - 1) {
-                nextButton.classList.add('hidden');
-                quizButton.classList.remove('hidden');
+                nextButton.classList.add('hidden'); quizButton.classList.remove('hidden');
             } else {
-                nextButton.classList.remove('hidden');
-                quizButton.classList.add('hidden');
+                nextButton.classList.remove('hidden'); quizButton.classList.add('hidden');
             }
             stepContent.classList.remove('fade-in');
             void stepContent.offsetWidth;
@@ -417,159 +287,128 @@
         }
 
         function nextStep() {
-            if (currentStep < trainingSteps.length - 1) {
-                currentStep++;
-                displayStep(currentStep);
-            }
+            console.log("nextStep called"); // DEBUG LOG
+            if (currentStep < trainingSteps.length - 1) { currentStep++; displayStep(currentStep); }
         }
-
         function prevStep() {
-            if (currentStep > 0) {
-                currentStep--;
-                displayStep(currentStep);
-            }
+            console.log("prevStep called"); // DEBUG LOG
+            if (currentStep > 0) { currentStep--; displayStep(currentStep); }
         }
-
 
         function startQuiz() {
-            // --- Update and Check Daily Attempt Count ---
-            // This logic runs each time the user clicks "Start Quiz" or "Retry Quiz"
-            const currentAttemptNumber = attemptCount + 1; // Tentative attempt number
-
-            if (currentAttemptNumber > MAX_ATTEMPTS) {
-                showRetryLimitScreen(); // Show limit screen based on already loaded count
-                return;
-            }
-
-            // Increment the actual attempt count for this try
+            console.log("startQuiz called"); // DEBUG LOG
+            const currentAttemptNumber = attemptCount + 1;
+            if (currentAttemptNumber > MAX_ATTEMPTS) { showRetryLimitScreen(); return; }
             attemptCount = currentAttemptNumber;
-
-            // Update localStorage with the new attempt count for today
             const currentDate = getStorageDateString();
             const storageKey = `forkliftAttempts_${xlcId}`;
-            try {
-                 localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: attemptCount }));
-            } catch (e) {
-                 console.error("Could not update attempt count in localStorage:", e);
-                 // Continue quiz, but attempts might not persist correctly if localStorage fails
-            }
-            // --- End Daily Attempt Update ---
-
-
-            // Shuffle questions for this attempt
+            try { localStorage.setItem(storageKey, JSON.stringify({ date: currentDate, attempts: attemptCount })); }
+            catch (e) { console.error("Could not update attempt count in localStorage:", e); }
             currentShuffledQuestions = shuffleArray(originalQuizQuestions);
             currentQuestionIndex = 0;
             userAnswers = new Array(currentShuffledQuestions.length).fill(null);
-            score = 0;
-            percentage = 0;
-            passStatus = '';
-
-            // Update attempt indicator UI
+            incorrectQuestions = []; score = 0; percentage = 0; passStatus = '';
             attemptIndicator.textContent = `Attempt ${attemptCount} / ${MAX_ATTEMPTS}`;
-
             showScreen(quizContainer);
             displayQuestion(currentQuestionIndex);
-            submitQuizButton.classList.add('hidden');
-            nextQuestionButton.classList.remove('hidden');
+            submitQuizButton.classList.add('hidden'); nextQuestionButton.classList.remove('hidden');
         }
 
-        // displayQuestion, selectAnswer, nextQuestion remain unchanged
-
-         function displayQuestion(index) {
-            if (index < 0 || index >= currentShuffledQuestions.length) return;
-
+        function displayQuestion(index) {
+            // console.log("displayQuestion called for index:", index); // DEBUG LOG
+             if (index < 0 || index >= currentShuffledQuestions.length) return;
             const q = currentShuffledQuestions[index];
-            let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p>`;
-            optionsHtml += '<div class="space-y-3">';
-
-            q.options.forEach((option) => {
-                const escapedOption = option.replace(/'/g, "\\'");
-                const isSelected = userAnswers[index] === option;
-                optionsHtml += `
-                    <div
-                        class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}"
-                        onclick="selectAnswer(${index}, '${escapedOption}')">
-                        ${option}
-                    </div>
-                `;
-            });
-             optionsHtml += '</div>';
-
-            quizQuestionDiv.innerHTML = optionsHtml;
-
-             if(index === currentShuffledQuestions.length - 1) {
-                 nextQuestionButton.classList.add('hidden');
-                 submitQuizButton.classList.remove('hidden');
-             } else {
-                 nextQuestionButton.classList.remove('hidden');
-                 submitQuizButton.classList.add('hidden');
+             if (!q || !q.question || !Array.isArray(q.options)) {
+                 console.error("Invalid question data for index:", index, q);
+                 quizQuestionDiv.innerHTML = '<p class="text-red-500">Error loading question.</p>';
+                 return;
              }
-
-             quizQuestionDiv.classList.remove('fade-in');
-             void quizQuestionDiv.offsetWidth;
-             quizQuestionDiv.classList.add('fade-in');
+            let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p><div class="space-y-3">`;
+            q.options.forEach((option) => { // Use restored options
+                const escapedOption = String(option).replace(/'/g, "\\'");
+                const isSelected = userAnswers[index] === option;
+                // Ensure onclick is properly formatted
+                optionsHtml += `<div class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${index}, '${escapedOption}')"> ${option} </div>`;
+            });
+            optionsHtml += '</div>';
+            quizQuestionDiv.innerHTML = optionsHtml;
+            if(index === currentShuffledQuestions.length - 1) {
+                 nextQuestionButton.classList.add('hidden'); submitQuizButton.classList.remove('hidden');
+            } else {
+                 nextQuestionButton.classList.remove('hidden'); submitQuizButton.classList.add('hidden');
+            }
+            quizQuestionDiv.classList.remove('fade-in');
+            void quizQuestionDiv.offsetWidth;
+            quizQuestionDiv.classList.add('fade-in');
         }
 
         function selectAnswer(questionIndex, answer) {
+            // console.log(`selectAnswer called: Q${questionIndex}, A:"${answer}"`); // DEBUG LOG
             userAnswers[questionIndex] = answer;
-            displayQuestion(questionIndex);
+            displayQuestion(questionIndex); // Re-render to show selection
         }
 
         function nextQuestion() {
-            if (userAnswers[currentQuestionIndex] === null) {
-                showMessage("Please select an answer before proceeding.");
-                return;
-            }
-            if (currentQuestionIndex < currentShuffledQuestions.length - 1) {
-                currentQuestionIndex++;
-                displayQuestion(currentQuestionIndex);
-            }
+            console.log("nextQuestion called"); // DEBUG LOG
+            if (userAnswers[currentQuestionIndex] === null) { showMessage("Please select an answer before proceeding."); return; }
+            if (currentQuestionIndex < currentShuffledQuestions.length - 1) { currentQuestionIndex++; displayQuestion(currentQuestionIndex); }
         }
-
 
         function submitQuiz() {
-            if (userAnswers[currentQuestionIndex] === null) {
-                showMessage("Please select an answer for the final question.");
-                return;
-            }
-
-            // Calculate score and percentage (Unchanged)
-            score = 0;
-            userAnswers.forEach((answer, index) => {
-                if (answer === currentShuffledQuestions[index].correctAnswer) {
-                    score++;
+            console.log("submitQuiz called"); // DEBUG LOG
+            try { // Add try...catch around the whole function logic
+                if (userAnswers[currentQuestionIndex] === null) {
+                    showMessage("Please select an answer for the final question."); return;
                 }
-            });
-            percentage = Math.round((score / currentShuffledQuestions.length) * 100);
-            passStatus = percentage >= PASSING_PERCENTAGE ? 'Pass' : 'Fail';
+                score = 0; incorrectQuestions = [];
+                userAnswers.forEach((answer, index) => {
+                    if (currentShuffledQuestions[index] && answer === currentShuffledQuestions[index].correctAnswer) { score++; }
+                    else if (currentShuffledQuestions[index] && currentShuffledQuestions[index].question) { incorrectQuestions.push(currentShuffledQuestions[index].question); }
+                    else { console.warn("Issue comparing answer for question index:", index); }
+                });
 
-            // Simulate Database Logging (calls updated logQuizResult)
-            logQuizResult();
+                percentage = currentShuffledQuestions.length > 0 ? Math.round((score / currentShuffledQuestions.length) * 100) : 0;
+                passStatus = percentage >= PASSING_PERCENTAGE ? 'Pass' : 'Fail';
+                console.log(`Quiz submitted: Score=${score}, Percentage=${percentage}, Status=${passStatus}`); // DEBUG LOG
 
-            // Display appropriate screen based on Pass/Fail and attempts
-            if (passStatus === 'Pass') {
-                displayCertificate();
-            } else {
-                 // Check attempt count again *after* this attempt is completed
-                if (attemptCount < MAX_ATTEMPTS) {
-                    displayFailScreen(false); // Show fail screen with retry option
+                logQuizResult(); // Log result before potentially switching screen
+
+                console.log("Determining next screen..."); // DEBUG LOG
+                if (passStatus === 'Pass') {
+                    console.log("Calling displayCertificate..."); // DEBUG LOG
+                    displayCertificate();
                 } else {
-                    showRetryLimitScreen(); // Show retry limit screen (already hit max attempts)
+                    console.log("Checking attempt count for failure screen..."); // DEBUG LOG
+                    if (attemptCount < MAX_ATTEMPTS) {
+                        console.log("Calling displayFailScreen (Retry available)..."); // DEBUG LOG
+                        displayFailScreen(false);
+                    } else {
+                        console.log("Calling showRetryLimitScreen..."); // DEBUG LOG
+                        showRetryLimitScreen();
+                    }
                 }
+            } catch (error) {
+                console.error("Error occurred in submitQuiz:", error);
+                showMessage("An unexpected error occurred while submitting the quiz. Please try again or contact support.");
             }
         }
 
-        // displayCertificate remains unchanged
         function displayCertificate() {
+            console.log("displayCertificate called"); // DEBUG LOG
+             if (!certificateScreen || !certificateRecipient || !certificateDate) {
+                 console.error("Certificate screen elements not found!"); return;
+             }
             certificateRecipient.textContent = `${firstName} ${lastName}`;
             certificateDate.textContent = getCurrentDateString();
             showScreen(certificateScreen);
         }
 
-
         function displayFailScreen(isRetryLimitReached) {
+             console.log(`displayFailScreen called with isRetryLimitReached=${isRetryLimitReached}`); // DEBUG LOG
+             if (!resultsScreen || !resultsTitle || !scoreDisplay || !resultsMessage || !retryQuizButton) {
+                 console.error("Results screen elements not found!"); return;
+             }
             resultsTitle.textContent = "Quiz Attempt Failed";
-            // Updated score display to use xlcId and remove department
             scoreDisplay.innerHTML = `
                 User: <span class="font-bold">${firstName} ${lastName}</span> (ID: ${xlcId})<br>
                 Attempt: <span class="font-bold">${attemptCount} / ${MAX_ATTEMPTS}</span> (Today)<br>
@@ -577,144 +416,109 @@
                 Percentage: <span class="font-bold text-red-600">${percentage}%</span><br>
                 Status: <span class="font-bold text-red-600">Fail</span> (Required: ${PASSING_PERCENTAGE}%)
             `;
-
             if (isRetryLimitReached) {
                 resultsMessage.textContent = "You have reached the maximum number of quiz attempts for today. Please contact your supervisor if needed.";
-                retryQuizButton.classList.add('hidden'); // Hide retry button
+                retryQuizButton.classList.add('hidden');
             } else {
                  resultsMessage.textContent = `You need ${PASSING_PERCENTAGE}% to pass. Please review the material and try again. You have ${MAX_ATTEMPTS - attemptCount} attempt(s) remaining today.`;
-                 retryQuizButton.classList.remove('hidden'); // Show retry button
+                 retryQuizButton.classList.remove('hidden');
             }
             showScreen(resultsScreen);
         }
-
-        // showRetryLimitScreen remains unchanged
-         function showRetryLimitScreen() {
-            displayFailScreen(true); // Call fail screen with retry limit flag
-        }
-
+        function showRetryLimitScreen() { console.log("showRetryLimitScreen called"); displayFailScreen(true); }
 
         function logQuizResult() {
+            console.log("logQuizResult called"); // DEBUG LOG
             const { date, time } = getCurrentDateTime();
-            // Updated resultData object
-            const resultData = {
-                quizDate: date,
-                quizTime: time,
-                firstName: firstName,
-                lastName: lastName,
-                xlcId: xlcId, // Changed from employeeId
-                // department removed
-                quizScore: score,
-                quizPercentage: percentage,
-                passFail: passStatus,
-                attemptNumberToday: attemptCount // Clarified attempt context
-            };
-
-            // --- DATABASE SIMULATION ---
+            const resultData = { quizDate: date, quizTime: time, firstName: firstName, lastName: lastName, xlcId: xlcId, quizScore: score, quizPercentage: percentage, passFail: passStatus, attemptNumberToday: attemptCount, incorrectQuestions: incorrectQuestions };
             console.log("Quiz Result Data (Simulated Database Entry):", resultData);
             try {
-                 // Store the latest result locally (optional), key updated
+                 let allResults = [];
+                 const allResultsRaw = localStorage.getItem(ALL_RESULTS_STORAGE_KEY);
+                 if (allResultsRaw) {
+                     // Add try-catch specifically for parsing allResults
+                     try {
+                         const parsed = JSON.parse(allResultsRaw);
+                         if (Array.isArray(parsed)) { allResults = parsed; }
+                         else { console.warn("Stored results data is not an array, resetting."); }
+                     } catch (parseError) {
+                         console.error("Invalid JSON in localStorage for all results, resetting.", parseError);
+                         allResults = []; // Reset if parsing fails
+                     }
+                 }
+                 allResults.push(resultData);
+                 localStorage.setItem(ALL_RESULTS_STORAGE_KEY, JSON.stringify(allResults));
                  localStorage.setItem(`lastResult_${xlcId}`, JSON.stringify(resultData));
-                 // console.log("Result saved to localStorage (for this browser only)."); // Less verbose logging
-            } catch (e) {
-                console.error("Could not save result to localStorage:", e);
-            }
-            // --- END DATABASE SIMULATION ---
+            } catch (e) { console.error("Could not save result to localStorage:", e); showMessage("Warning: Could not save result data locally."); }
         }
 
-        function downloadResults() {
-             const { date, time } = getCurrentDateTime();
-             const timestamp = `${date} ${time}`;
+        // --- Supervisor View Functions ---
+        function showSupervisorView() { console.log("showSupervisorView called"); showScreen(supervisorView); localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">Click "Load Local Results" to view data stored in this browser.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); }
+        function displayLocalResults() {
+            console.log("displayLocalResults called");
+             if (!localResultsTableDiv || !downloadAllButton || !clearAllButton) {
+                 console.error("Supervisor view elements not found!"); return;
+             }
+            try {
+                const allResultsRaw = localStorage.getItem(ALL_RESULTS_STORAGE_KEY);
+                if (!allResultsRaw) { localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">No results found in this browser\'s local storage.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); return; }
 
-            // Updated CSV Header and Data Row
-            const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,AttemptToday\n";
-            const safeFirstName = `"${firstName.replace(/"/g, '""')}"`;
-            const safeLastName = `"${lastName.replace(/"/g, '""')}"`;
-            const safeXlcId = `"${xlcId.replace(/"/g, '""')}"`; // Changed variable
+                let allResults = [];
+                // Add try-catch specifically for parsing allResults
+                try {
+                     const parsed = JSON.parse(allResultsRaw);
+                     if (Array.isArray(parsed)) { allResults = parsed; }
+                     else { console.warn("Stored results data is not an array, resetting."); }
+                } catch (parseError) {
+                     console.error("Invalid JSON in localStorage for all results, resetting.", parseError);
+                     allResults = []; // Reset if parsing fails
+                }
 
-            // Removed department, updated ID field, updated attempt context
-            const csvData = `"${date}","${time}",${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},"${passStatus}",${attemptCount}\n`;
-            const csvContent = csvHeader + csvData;
 
-            // Trigger download (logic unchanged, filename updated)
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            if (link.download !== undefined) {
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                const dateStr = date;
-                // Updated filename
-                link.setAttribute("download", `Forklift_Quiz_${xlcId}_${dateStr}_Attempt${attemptCount}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            } else {
-                showMessage("CSV download is not supported in your browser.");
-            }
-        }
+                if (allResults.length === 0) { localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">No results found or data format error.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); return; }
 
-        // downloadCertificate remains unchanged
-        function downloadCertificate() {
-            const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate');
-            if (html2canvas) {
-                 html2canvas(certificateElement, { scale: 2, useCORS: true, backgroundColor: '#fefce8' })
-                 .then(canvas => {
-                    const link = document.createElement('a');
-                    link.download = `Forklift_Certificate_${firstName}_${lastName}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                }).catch(err => {
-                    console.error("Error generating certificate image:", err);
-                    showMessage("Could not generate certificate image.");
+                let tableHtml = '<table><thead><tr>';
+                const headers = allResults.length > 0 && allResults[0] ? Object.keys(allResults[0]) : [];
+                if (headers.length === 0) { localResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">Stored results have no data fields.</p>'; return; }
+                headers.forEach(header => { const displayHeader = header.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); tableHtml += `<th>${displayHeader}</th>`; });
+                tableHtml += '</tr></thead><tbody>';
+                allResults.forEach(result => {
+                    if (typeof result !== 'object' || result === null) return;
+                    tableHtml += '<tr>';
+                    headers.forEach(header => {
+                        let cellData = result[header];
+                        if (header === 'incorrectQuestions' && Array.isArray(cellData)) { cellData = cellData.join('; '); }
+                        const tdClass = (header === 'incorrectQuestions' && String(cellData).length > 50) ? ' class="wrap"' : '';
+                        tableHtml += `<td${tdClass}>${cellData ?? ''}</td>`;
+                    });
+                    tableHtml += '</tr>';
                 });
-            } else {
-                 showMessage("Certificate download library (html2canvas) not loaded.");
-            }
+                tableHtml += '</tbody></table>';
+                localResultsTableDiv.innerHTML = tableHtml;
+                downloadAllButton.classList.remove('hidden'); clearAllButton.classList.remove('hidden');
+            } catch (e) { console.error("Error loading or parsing local results:", e); localResultsTableDiv.innerHTML = '<p class="text-red-500 text-center p-4">Error loading results from local storage. Data might be corrupted.</p>'; downloadAllButton.classList.add('hidden'); clearAllButton.classList.add('hidden'); }
         }
 
-
-        // showMessage, closeMessageBox remain unchanged
-         function showMessage(message) {
-            messageText.textContent = message;
-            messageBox.classList.remove('hidden');
-        }
-
-        function closeMessageBox() {
-            messageBox.classList.add('hidden');
-        }
-
-        // restartTraining updated
+        // --- restartTraining ---
         function restartTraining() {
-            // Clear input fields
-            firstNameInput.value = '';
-            lastNameInput.value = '';
-            xlcIdInput.value = ''; // Changed ID
-            // departmentInput removed
-
-            // Reset state variables
-            firstName = '';
-            lastName = '';
-            xlcId = ''; // Changed variable
-            // department removed
-            currentStep = 0;
-            currentQuestionIndex = 0;
-            userAnswers = [];
-            score = 0;
-            percentage = 0;
-            passStatus = '';
-            attemptCount = 0; // Reset session attempt count (daily count logic is handled in startTraining)
-            currentShuffledQuestions = [];
-
-            // NOTE: We don't clear the daily attempt count from localStorage here.
-            // The logic in startTraining() handles checking the date and resetting if necessary.
-
+            console.log("restartTraining called");
+            firstNameInput.value = ''; lastNameInput.value = ''; xlcIdInput.value = '';
+            firstName = ''; lastName = ''; xlcId = '';
+            currentStep = 0; currentQuestionIndex = 0; userAnswers = []; score = 0;
+            percentage = 0; passStatus = ''; attemptCount = 0;
+            currentShuffledQuestions = []; incorrectQuestions = [];
             showScreen(welcomeScreen);
         }
 
         // --- Initial Setup ---
-        showScreen(welcomeScreen);
+        // Add checks for essential elements before showing the initial screen
+         if (!welcomeScreen || !trainingContainer || !quizContainer || !resultsScreen || !certificateScreen || !supervisorView || !messageBox || !firstNameInput || !lastNameInput || !xlcIdInput || !stepContent || !quizQuestionDiv || !scoreDisplay || !certificateRecipient) {
+             console.error("Initialization failed: One or more required elements not found in the DOM. Check IDs.");
+             document.body.innerHTML = '<p style="color: red; text-align: center; padding: 20px;">Error: Application could not initialize correctly. Required elements are missing.</p>';
+         } else {
+            console.log("Application initialized successfully.");
+            showScreen(welcomeScreen); // Start at the welcome screen only if elements are found
+         }
 
     </script>
 
