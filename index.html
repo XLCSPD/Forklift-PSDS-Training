@@ -11,7 +11,6 @@
     <style>
       @font-face {
         font-family: 'LucideIcons';
-         /* Correct: Lucide font via unpkg */
         src: url(https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf) format('truetype');
       }
       /* Styles remain the same... */
@@ -34,11 +33,7 @@
       .certificate::before, .certificate::after { content: ''; position: absolute; width: 50px; height: 50px; background-color: #f3f4f6; border-radius: 50%; z-index: -1; }
       .certificate::before { top: -25px; left: -25px; }
       .certificate::after { top: -25px; right: -25px; }
-       #supervisor-results-table table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-       #supervisor-results-table th, #supervisor-results-table td { border: 1px solid #ddd; padding: 8px; text-align: left; font-size: 0.85rem; }
-       #supervisor-results-table th { background-color: #f2f2f2; }
-       #supervisor-results-table tr:nth-child(even) { background-color: #f9f9f9; }
-       #supervisor-results-table td.wrap { white-space: normal; word-break: break-word; }
+       /* Supervisor table styles removed as view is removed */
        .screen-container { position: relative; padding-top: 60px; }
        .logo-container { position: absolute; top: 1rem; right: 1rem; line-height: 1; text-align: right; }
        .logo-xlc { display: block; font-weight: 900; font-size: 2.25rem; letter-spacing: -0.025em; color: #000000; }
@@ -59,8 +54,7 @@
         </div>
 
         <div id="welcome-screen" class="fade-in screen-container">
-             <button onclick="showSupervisorView()" class="absolute top-4 left-4 text-xs bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded shadow">Supervisor View</button>
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center pt-8">Forklift Point Transfer Training</h1>
+             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center pt-8">Forklift Point Transfer Training</h1>
             <p class="text-gray-600 mb-6 text-center">Learn the steps for using the scanner for directed work orders. Please enter your details below.</p>
             <div class="space-y-4 max-w-md mx-auto">
                 <div> <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label> <input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"> </div>
@@ -115,25 +109,7 @@
              </div>
         </div>
 
-         <div id="supervisor-view" class="hidden fade-in screen-container">
-             <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3 text-center">Supervisor View - All Results</h2>
-             <p class="text-sm text-center text-red-600 mb-4"> <span class="font-bold">Requires Secure Implementation:</span> Accessing all results requires supervisor authentication and secure Firestore rules, which are not implemented in this example. </p>
-             <div id="supervisor-login-area" class="text-center mb-4 p-4 border rounded bg-gray-100">
-                 <p class="mb-2 font-semibold">Supervisor Login Required</p>
-                 <input type="email" id="supervisor-email" placeholder="Supervisor Email" class="px-2 py-1 border rounded mb-2">
-                 <input type="password" id="supervisor-password" placeholder="Password" class="px-2 py-1 border rounded mb-2">
-                 <button onclick="loginSupervisor()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-1 px-3 rounded shadow">Login</button>
-                 <p id="supervisor-status" class="text-xs mt-2 text-gray-600">Status: Not Logged In</p>
-             </div>
-             <div class="text-center mb-4 space-x-3">
-                 <button onclick="fetchAllResults()" id="fetch-all-button" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow disabled:opacity-50" disabled> Fetch All Results (Requires Login) </button>
-                 <button onclick="downloadAllResults()" id="download-all-button" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow hidden"> Download All Results (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
-             </div>
-             <div id="supervisor-results-table" class="overflow-x-auto border border-gray-300 rounded-lg p-2 bg-gray-50 max-h-96 overflow-y-auto"> <p class="text-gray-500 text-center p-4">Login and click "Fetch All Results" to view data.</p> </div>
-              <div class="text-center mt-6"> <button onclick="restartTraining()" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto"> Back to Welcome Screen <span class="lucide ml-2">&#xe89b;</span> </button> </div>
-         </div>
-
-        <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+         <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
             <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center"> <p id="message-text" class="mb-4 text-gray-700"></p> <button onclick="closeMessageBox()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out"> OK </button> </div>
         </div>
     </div>
@@ -163,7 +139,7 @@
         // --- Configuration ---
         const PASSING_PERCENTAGE = 80;
 
-        // --- Training Steps Data --- << RESTORED >>
+        // --- Training Steps Data --- (Content restored)
         const trainingSteps = [
              { title: "Step 1: Select Vehicle Type", description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: <span class="scanner-highlight">REACH2</span>\n Work Area:\n                ` },
              { title: "Step 2: Leave Work Area Empty & Enter", description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: REACH2\n Work Area: <span class="scanner-highlight">[Leave Empty]</span>\n                ` },
@@ -176,7 +152,7 @@
              { title: "Step 9: Handling Overrides (If Needed)", description: "If you can't deposit the pallet (e.g., location is full), press the 'F4' key to override.", scannerContent: `\n Product Deposit\n Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>\n\n Cannot Deposit Here?\n                ` },
              { title: "Step 10: Select Override Reason", description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.", scannerContent: `\n Override Location\n Lod: 00100474091617976961\n Loc: 2L55B\n Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)\n Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location\n\n Press Enter\n                ` }
         ];
-        // --- Quiz Questions Data --- << RESTORED >>
+        // --- Quiz Questions Data --- (Restored)
         const originalQuizQuestions = [
             { question: "When you start, what's the first thing you need to choose on the screen?", options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"], correctAnswer: "Vehicle Type" },
             { question: "After picking the vehicle, what menu option do you choose to get your task?", options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"], correctAnswer: "Option 8 (Directed Work)" },
@@ -191,10 +167,9 @@
         let currentStep = 0, currentQuestionIndex = 0, score = 0, percentage = 0;
         let currentShuffledQuestions = [], userAnswers = [], incorrectQuestions = [];
         let firstName = '', lastName = '', xlcId = '', passStatus = '';
-        let isSupervisorLoggedIn = false;
+        // Removed isSupervisorLoggedIn
 
         // --- DOM Elements ---
-        // (References remain the same)
         const welcomeScreen = document.getElementById('welcome-screen');
         const firstNameInput = document.getElementById('firstName');
         const lastNameInput = document.getElementById('lastName');
@@ -221,18 +196,14 @@
         const certificateDate = document.getElementById('certificate-date');
         const messageBox = document.getElementById('message-box');
         const messageText = document.getElementById('message-text');
-        const supervisorView = document.getElementById('supervisor-view');
-        const supervisorStatus = document.getElementById('supervisor-status');
-        const fetchAllButton = document.getElementById('fetch-all-button');
-        const supervisorResultsTableDiv = document.getElementById('supervisor-results-table');
-        const downloadAllButton = document.getElementById('download-all-button');
+        // Removed supervisor element references
 
 
         // --- Helper Functions ---
         function shuffleArray(array) { let currentIndex = array.length, randomIndex; const newArray = [...array]; while (currentIndex !== 0) { randomIndex = Math.floor(Math.random() * currentIndex); currentIndex--; [newArray[currentIndex], newArray[randomIndex]] = [ newArray[randomIndex], newArray[currentIndex]]; } return newArray; }
         function getCurrentDateString(format = 'en-US') { const options = { year: 'numeric', month: 'long', day: 'numeric' }; return new Date().toLocaleDateString(format, options); }
         function getCurrentDateTime() { const now = new Date(); const date = now.toLocaleDateString('en-CA'); const time = now.toLocaleTimeString('en-US', { hour12: false }); return { date, time }; }
-        function showScreen(screenToShow) { if (!screenToShow) { console.error("showScreen called with null/undefined screen"); return; } welcomeScreen.classList.add('hidden'); trainingContainer.classList.add('hidden'); quizContainer.classList.add('hidden'); resultsScreen.classList.add('hidden'); certificateScreen.classList.add('hidden'); if(supervisorView) supervisorView.classList.add('hidden'); screenToShow.classList.remove('hidden'); document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center'); }
+        function showScreen(screenToShow) { if (!screenToShow) { console.error("showScreen called with null/undefined screen"); return; } welcomeScreen.classList.add('hidden'); trainingContainer.classList.add('hidden'); quizContainer.classList.add('hidden'); resultsScreen.classList.add('hidden'); certificateScreen.classList.add('hidden'); /* supervisorView removed */ screenToShow.classList.remove('hidden'); document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center'); }
         function showMessage(message) { if(messageText && messageBox){ messageText.textContent = message; messageBox.classList.remove('hidden'); } else { console.error("Message box elements not found"); alert(message); } }
         function closeMessageBox() { if(messageBox) messageBox.classList.add('hidden'); }
         function downloadCertificate() { const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate'); if (typeof html2canvas !== 'undefined' && html2canvas && certificateElement) { html2canvas(certificateElement, { scale: 2, useCORS: true, backgroundColor: '#fefce8' }).then(canvas => { const link = document.createElement('a'); link.download = `Forklift_Certificate_${firstName}_${lastName}.png`; link.href = canvas.toDataURL('image/png'); link.click(); }).catch(err => { console.error("Error generating certificate image:", err); showMessage("Could not generate certificate image."); }); } else { showMessage("Certificate download library or element not found."); } }
@@ -280,40 +251,25 @@
             currentQuestionIndex = 0;
             userAnswers = new Array(currentShuffledQuestions.length).fill(null);
             incorrectQuestions = []; score = 0; percentage = 0; passStatus = '';
-            // Ensure quizContainer exists before showing
             const targetScreen = document.getElementById('quiz-container');
             if (targetScreen) {
                  showScreen(targetScreen);
                  displayQuestion(currentQuestionIndex);
                  submitQuizButton.classList.add('hidden'); nextQuestionButton.classList.remove('hidden');
-            } else {
-                 console.error("Quiz container element not found!");
-                 showMessage("Error: Could not start the quiz.");
-            }
+            } else { console.error("Quiz container element not found!"); showMessage("Error: Could not start the quiz."); }
         }
 
         function displayQuestion(index) {
              if (index < 0 || index >= currentShuffledQuestions.length) return;
-             // Ensure quizQuestionDiv exists
              if (!quizQuestionDiv) { console.error("quizQuestionDiv element not found!"); return; }
              const q = currentShuffledQuestions[index];
              if (!q || !q.question || !Array.isArray(q.options)) { console.error("Invalid question data for index:", index, q); quizQuestionDiv.innerHTML = '<p class="text-red-500">Error loading question.</p>'; return; }
             let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p><div class="space-y-3">`;
-            q.options.forEach((option) => {
-                const escapedOption = String(option).replace(/'/g, "\\'");
-                const isSelected = userAnswers[index] === option;
-                optionsHtml += `<div class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${index}, '${escapedOption}')"> ${option} </div>`;
-            });
+            q.options.forEach((option) => { const escapedOption = String(option).replace(/'/g, "\\'"); const isSelected = userAnswers[index] === option; optionsHtml += `<div class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}" onclick="selectAnswer(${index}, '${escapedOption}')"> ${option} </div>`; });
             optionsHtml += '</div>';
-            quizQuestionDiv.innerHTML = optionsHtml; // Set the innerHTML
-            // Check button existence before modifying classList
-            if(index === currentShuffledQuestions.length - 1) {
-                 if(nextQuestionButton) nextQuestionButton.classList.add('hidden');
-                 if(submitQuizButton) submitQuizButton.classList.remove('hidden');
-            } else {
-                 if(nextQuestionButton) nextQuestionButton.classList.remove('hidden');
-                 if(submitQuizButton) submitQuizButton.classList.add('hidden');
-            }
+            quizQuestionDiv.innerHTML = optionsHtml;
+            if(index === currentShuffledQuestions.length - 1) { if(nextQuestionButton) nextQuestionButton.classList.add('hidden'); if(submitQuizButton) submitQuizButton.classList.remove('hidden'); }
+            else { if(nextQuestionButton) nextQuestionButton.classList.remove('hidden'); if(submitQuizButton) submitQuizButton.classList.add('hidden'); }
             quizQuestionDiv.classList.remove('fade-in');
             void quizQuestionDiv.offsetWidth; quizQuestionDiv.classList.add('fade-in');
         }
@@ -323,7 +279,7 @@
 
         function submitQuiz() {
             console.log("submitQuiz called");
-            if (!submitQuizButton) { console.error("Submit button not found"); return; } // Check button exists
+            if (!submitQuizButton) { console.error("Submit button not found"); return; }
             submitQuizButton.disabled = true; submitQuizButton.textContent = 'Submitting...';
             try {
                 if (userAnswers[currentQuestionIndex] === null) { showMessage("Please select an answer for the final question."); submitQuizButton.disabled = false; submitQuizButton.textContent = 'Submit Answers'; return; }
@@ -341,17 +297,13 @@
 
         function logQuizResult() { console.log("logQuizResult called"); return new Promise((resolve, reject) => { if (typeof firestoreDb === 'undefined' || !firestoreDb) { const errorMsg = "Firestore not initialized!"; console.error(errorMsg); showMessage("Error: Cannot connect to database."); reject(new Error(errorMsg)); return; } const { date, time } = getCurrentDateTime(); const resultData = { quizDate: date, quizTime: time, firstName: firstName, lastName: lastName, xlcId: xlcId, quizScore: score, quizPercentage: percentage, passFail: passStatus, incorrectQuestions: incorrectQuestions, timestamp: firebase.firestore.FieldValue.serverTimestamp() }; console.log("Adding document to Firestore:", resultData); firestoreDb.collection("quizResults").add(resultData) .then((docRef) => { console.log("Document written with ID: ", docRef.id); showMessage("Quiz results saved."); resolve(docRef); }) .catch((error) => { console.error("Error adding document: ", error); showMessage("Error saving quiz results."); reject(error); }); }); }
 
-        // --- Supervisor View Functions (Placeholders) ---
-        function showSupervisorView() { console.log("showSupervisorView called"); isSupervisorLoggedIn = false; if (supervisorStatus) supervisorStatus.textContent = "Status: Not Logged In"; if (fetchAllButton) fetchAllButton.disabled = true; if (downloadAllButton) downloadAllButton.classList.add('hidden'); if (supervisorResultsTableDiv) supervisorResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">Login and click "Fetch All Results" to view data.</p>'; if (supervisorView) showScreen(supervisorView); else console.error("Supervisor view element not found"); }
-        function loginSupervisor() { console.log("loginSupervisor called (Placeholder)"); showMessage("Supervisor login functionality needs to be implemented using Firebase Authentication."); }
-        function fetchAllResults() { console.log("fetchAllResults called (Placeholder)"); if (!isSupervisorLoggedIn) { showMessage("You must be logged in as a supervisor."); return; } if (!firestoreDb) { showMessage("Database connection not available."); return; } showMessage("Fetching all results... (Requires Secure Firestore Rules)"); supervisorResultsTableDiv.innerHTML = '<p class="text-center p-4">Loading...</p>'; downloadAllButton.classList.add('hidden'); firestoreDb.collection("quizResults").get().then((querySnapshot) => { const allResults = []; querySnapshot.forEach((doc) => { allResults.push({ id: doc.id, ...doc.data() }); }); console.log(`Fetched ${allResults.length} results.`); if (allResults.length === 0) { supervisorResultsTableDiv.innerHTML = '<p class="text-gray-500 text-center p-4">No results found.</p>'; return; } let tableHtml = '<table><thead><tr>'; const headers = allResults.length > 0 && allResults[0] ? Object.keys(allResults[0]) : []; if (headers.length === 0) { supervisorResultsTableDiv.innerHTML = '<p>No data fields.</p>'; return; } headers.forEach(header => { const displayHeader = header.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase()); tableHtml += `<th>${displayHeader}</th>`; }); tableHtml += '</tr></thead><tbody>'; allResults.forEach(result => { if (typeof result !== 'object' || result === null) return; tableHtml += '<tr>'; headers.forEach(header => { let cellData = result[header]; if (header === 'timestamp' && cellData && typeof cellData.toDate === 'function') { cellData = cellData.toDate().toLocaleString(); } else if (header === 'incorrectQuestions' && Array.isArray(cellData)) { cellData = cellData.join('; '); } const tdClass = (header === 'incorrectQuestions' && String(cellData).length > 50) ? ' class="wrap"' : ''; tableHtml += `<td${tdClass}>${cellData ?? ''}</td>`; }); tableHtml += '</tr>'; }); tableHtml += '</tbody></table>'; supervisorResultsTableDiv.innerHTML = tableHtml; downloadAllButton.classList.remove('hidden'); }).catch((error) => { console.error("Error fetching all results: ", error); if (error.code === 'permission-denied') { supervisorResultsTableDiv.innerHTML = '<p class="text-red-500 text-center p-4">Permission Denied.</p>'; showMessage("Permission Denied."); } else { supervisorResultsTableDiv.innerHTML = '<p class="text-red-500 text-center p-4">Error fetching results.</p>'; showMessage("Error fetching results."); } downloadAllButton.classList.add('hidden'); }); }
-        function downloadAllResults() { console.log("downloadAllResults called (Placeholder)"); if (!isSupervisorLoggedIn) { showMessage("You must be logged in."); return; } if (!firestoreDb) { showMessage("Database connection not available."); return; } showMessage("Preparing download..."); firestoreDb.collection("quizResults").orderBy("timestamp", "desc").get().then((querySnapshot) => { const allResults = []; querySnapshot.forEach((doc) => { allResults.push({ id: doc.id, ...doc.data() }); }); if (allResults.length === 0) { showMessage("No results found."); return; } const headers = ["QuizDate", "QuizTime", "FirstName", "LastName", "XLC_ID", "QuizScore", "QuizPercentage", "PassFail", "IncorrectQuestions", "Timestamp"]; let csvContent = headers.join(',') + '\n'; allResults.forEach(result => { const row = headers.map(header => { let value = result[header] ?? ''; if (header === 'Timestamp' && value && typeof value.toDate === 'function') { value = value.toDate().toISOString(); } else if (header === 'IncorrectQuestions' && Array.isArray(value)) { value = value.join('; '); } const safeValue = `"${String(value).replace(/"/g, '""')}"`; return safeValue; }); csvContent += row.join(',') + '\n'; }); const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); if (link.download !== undefined) { const url = URL.createObjectURL(blob); link.setAttribute("href", url); const dateStr = new Date().toLocaleDateString('en-CA'); link.setAttribute("download", `All_Forklift_Results_${dateStr}.csv`); link.style.visibility = 'hidden'; document.body.appendChild(link); link.click(); document.body.removeChild(link); URL.revokeObjectURL(url); } else { showMessage("CSV download not supported."); } }).catch((error) => { console.error("Error fetching data for download: ", error); showMessage("Error fetching data for download."); }); }
+        // --- Supervisor View Functions (Removed) ---
 
         // --- restartTraining ---
-        function restartTraining() { console.log("restartTraining called"); if (firstNameInput) firstNameInput.value = ''; if (lastNameInput) lastNameInput.value = ''; if (xlcIdInput) xlcIdInput.value = ''; firstName = ''; lastName = ''; xlcId = ''; currentStep = 0; currentQuestionIndex = 0; userAnswers = []; score = 0; percentage = 0; passStatus = ''; currentShuffledQuestions = []; incorrectQuestions = []; isSupervisorLoggedIn = false; if (welcomeScreen) showScreen(welcomeScreen); }
+        function restartTraining() { console.log("restartTraining called"); if (firstNameInput) firstNameInput.value = ''; if (lastNameInput) lastNameInput.value = ''; if (xlcIdInput) xlcIdInput.value = ''; firstName = ''; lastName = ''; xlcId = ''; currentStep = 0; currentQuestionIndex = 0; userAnswers = []; score = 0; percentage = 0; passStatus = ''; currentShuffledQuestions = []; incorrectQuestions = []; if (welcomeScreen) showScreen(welcomeScreen); }
 
         // --- Initial Setup ---
-        function initializeApp() { const essentialElements = [ welcomeScreen, firstNameInput, lastNameInput, xlcIdInput, trainingContainer, stepContent, prevButton, nextButton, quizButton, stepIndicator, quizContainer, quizQuestionDiv, nextQuestionButton, submitQuizButton, resultsScreen, resultsTitle, scoreDisplay, resultsMessage, resultsActions, downloadCsvButton, certificateScreen, certificateRecipient, certificateDate, downloadCsvButtonCert, messageBox, messageText, supervisorView, supervisorStatus, fetchAllButton, supervisorResultsTableDiv, downloadAllButton ]; const missingElement = essentialElements.find(el => !el); if (missingElement) { const missingId = essentialElements.reduce((acc, el, index) => { if (!el && !acc) { const ids = ['welcome-screen', 'firstName', 'lastName', 'xlcId', 'training-container', 'step-content', 'prev-button', 'next-button', 'quiz-button', 'step-indicator', 'quiz-container', 'quiz-question', 'next-question-button', 'submit-quiz-button', 'results-screen', 'results-title', 'score-display', 'results-message', 'results-actions', 'download-csv-button', 'certificate-screen', 'certificate-recipient', 'certificate-date', 'download-csv-button-cert', 'message-box', 'message-text', 'supervisor-view', 'supervisor-status', 'fetch-all-button', 'supervisor-results-table', 'download-all-button']; return ids[index] || 'Unknown Element'; } return acc; }, null); console.error(`Initialization failed: Element with ID '${missingId || 'Unknown'}' not found.`); document.body.innerHTML = `<p style="color: red; text-align: center; padding: 20px;">Error: Application could not initialize correctly. Element '${missingId || 'Unknown'}' is missing.</p>`; return false; } console.log("All essential application elements found."); return true; }
+        function initializeApp() { const essentialElements = [ welcomeScreen, firstNameInput, lastNameInput, xlcIdInput, trainingContainer, stepContent, prevButton, nextButton, quizButton, stepIndicator, quizContainer, quizQuestionDiv, nextQuestionButton, submitQuizButton, resultsScreen, resultsTitle, scoreDisplay, resultsMessage, resultsActions, downloadCsvButton, certificateScreen, certificateRecipient, certificateDate, downloadCsvButtonCert, messageBox, messageText /* Supervisor elements removed */ ]; const missingElement = essentialElements.find(el => !el); if (missingElement) { const missingId = essentialElements.reduce((acc, el, index) => { if (!el && !acc) { const ids = ['welcome-screen', 'firstName', 'lastName', 'xlcId', 'training-container', 'step-content', 'prev-button', 'next-button', 'quiz-button', 'step-indicator', 'quiz-container', 'quiz-question', 'next-question-button', 'submit-quiz-button', 'results-screen', 'results-title', 'score-display', 'results-message', 'results-actions', 'download-csv-button', 'certificate-screen', 'certificate-recipient', 'certificate-date', 'download-csv-button-cert', 'message-box', 'message-text' /* Supervisor IDs removed */ ]; return ids[index] || 'Unknown Element'; } return acc; }, null); console.error(`Initialization failed: Element with ID '${missingId || 'Unknown'}' not found.`); document.body.innerHTML = `<p style="color: red; text-align: center; padding: 20px;">Error: App could not initialize. Element '${missingId || 'Unknown'}' is missing.</p>`; return false; } console.log("All essential application elements found."); return true; }
         document.addEventListener('DOMContentLoaded', (event) => { console.log("DOM fully loaded"); if (typeof firestoreDb !== 'undefined' && initializeApp()) { console.log("App initialized."); showScreen(welcomeScreen); } else if (typeof firestoreDb === 'undefined') { console.error("Firestore DB not initialized."); if (messageText && messageBox) { showMessage("Error: Cannot connect to the database service."); } else { alert("Error: Cannot connect to the database service."); } } else { console.error("DOM element check failed."); } });
 
     </script>
