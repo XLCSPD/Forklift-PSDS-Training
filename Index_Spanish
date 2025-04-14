@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="es"> <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Entrenamiento de Transferencia de Puntos para Montacargas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      /* Font face for Lucide Icons (used for icons) */
+      @font-face {
+        font-family: 'LucideIcons';
+        src: url(https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf) format('truetype');
+      }
+      /* Base style for Lucide icons */
+      .lucide { font-family: 'LucideIcons'; font-style: normal; font-weight: normal; font-variant: normal; text-rendering: auto; line-height: 1; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+      /* Fade-in animation */
+      .fade-in { animation: fadeIn 0.5s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+      /* Styles for the simulated scanner screen */
+      .scanner-screen { font-family: monospace; background-color: #c8e6c9; /* Light green */ color: #004d40; /* Dark green text */ border: 4px solid #388e3c; /* Medium green border */ padding: 15px; border-radius: 8px; min-height: 200px; white-space: pre; /* Preserve whitespace and line breaks */ line-height: 1.4; overflow-x: auto; /* Allow horizontal scroll if needed */ }
+      .scanner-highlight { background-color: #fff59d; /* Light yellow highlight */ font-weight: bold; padding: 2px; border-radius: 3px; }
+
+      /* Styles for quiz options */
+      .quiz-option { cursor: pointer; transition: background-color 0.2s ease-in-out; border: 2px solid #d1d5db; /* Gray border */ }
+      .quiz-option.selected { background-color: #bbdefb; /* Light blue selected */ border-color: #1976d2; /* Darker blue border */ }
+
+      /* Basic body and font setup */
+      html, body { height: 100%; margin: 0; }
+      body { font-family: 'Inter', sans-serif; }
+
+      /* Certificate Styles */
+      .certificate { border: 10px solid #facc15; /* Yellow border */ background-color: #fefce8; /* Light yellow background */ padding: 2rem 3rem; text-align: center; max-width: 600px; margin: auto; position: relative; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      .certificate h2 { font-size: 1.8rem; font-weight: bold; color: #1f2937; /* Dark gray */ margin-bottom: 0.5rem; letter-spacing: 1px; }
+      .certificate .subtitle { font-size: 1.1rem; font-weight: 600; color: #ca8a04; /* Dark yellow */ margin-bottom: 2rem; text-transform: uppercase; }
+      .certificate .recipient-name { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; border-bottom: 2px solid #facc15; display: inline-block; padding-bottom: 0.5rem; }
+      .certificate .acknowledgment { font-size: 0.9rem; color: #4b5563; /* Medium gray */ margin-bottom: 2.5rem; }
+      .certificate .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; }
+      .certificate .date { font-size: 0.9rem; color: #4b5563; }
+      /* Decorative corner elements for certificate */
+      .certificate::before, .certificate::after { content: ''; position: absolute; width: 50px; height: 50px; background-color: #f3f4f6; /* Light gray background */ border-radius: 50%; z-index: -1; }
+      .certificate::before { top: -25px; left: -25px; }
+      .certificate::after { top: -25px; right: -25px; }
+
+      /* Container for each screen (adds padding for logo) */
+      .screen-container { position: relative; padding-top: 60px; /* Space for the logo */ }
+
+      /* Logo positioning and styling */
+      .logo-container { position: absolute; top: 1rem; right: 1rem; line-height: 1; text-align: right; }
+      .logo-xlc { display: block; font-weight: 900; font-size: 2.25rem; letter-spacing: -0.025em; color: #000000; }
+      .logo-services { display: block; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.2em; color: #4b5563; margin-top: -4px; }
+
+      /* Style for disabled button */
+       button:disabled {
+           opacity: 0.6;
+           cursor: not-allowed;
+       }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-3xl">
+
+        <div class="logo-container">
+            <span class="logo-xlc">XLC</span>
+            <span class="logo-services">SERVICES</span>
+        </div>
+
+        <div id="welcome-screen" class="fade-in screen-container">
+             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center pt-8">Entrenamiento de Transferencia de Puntos</h1>
+            <p class="text-gray-600 mb-6 text-center">Aprenda los pasos para usar el escáner para órdenes de trabajo dirigidas. Por favor, ingrese sus datos a continuación.</p>
+            <div class="space-y-4 max-w-md mx-auto">
+                <div>
+                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">Nombre:</label>
+                    <input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Apellido:</label>
+                    <input type="text" id="lastName" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="xlcId" class="block text-sm font-medium text-gray-700 mb-1">ID de XLC:</label>
+                    <input type="text" id="xlcId" name="xlcId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            <div class="text-center mt-6">
+                <button id="start-training-button" onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                    Iniciar Entrenamiento <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="training-container" class="hidden screen-container">
+            <div id="step-content" class="mb-6 fade-in"></div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="prev-button" onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center" disabled>
+                    <span class="lucide mr-2">&#xea3a;</span> Ant </button>
+                <span id="step-indicator" class="text-sm text-gray-500">Paso 1 / X</span>
+                <button id="next-button" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center">
+                    Sig <span class="lucide ml-2">&#xea3c;</span> </button>
+                <button id="quiz-button" onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out hidden">
+                    Iniciar Prueba <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="hidden screen-container">
+             <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800">Verificación de Conocimiento</h2>
+                </div>
+            <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in"></div>
+            <div class="text-center">
+                 <button id="submit-quiz-button" onclick="submitQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out hidden">
+                    Enviar Respuestas
+                 </button>
+                 <button id="next-question-button" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
+                    Siguiente Pregunta <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="results-screen" class="hidden text-center fade-in screen-container">
+            <h2 id="results-title" class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Resultados de la Prueba</h2>
+            <div id="score-display" class="text-lg text-gray-700 mb-6 bg-red-100 border border-red-300 p-4 rounded-md"></div>
+            <p id="results-message" class="text-gray-600 mb-6">Por favor, revise el material de entrenamiento nuevamente.</p>
+            <div id="results-actions" class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Descargar Este Resultado (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                <button onclick="restartTraining()" id="restart-training-button-fail" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Reiniciar Entrenamiento <span class="lucide ml-2">&#xe89b;</span> </button>
+            </div>
+        </div>
+
+         <div id="certificate-screen" class="hidden fade-in screen-container">
+             <div class="certificate">
+                 <h2>CERTIFICADO</h2>
+                 <p class="subtitle">DE FINALIZACIÓN</p>
+                 <p class="subtitle" style="margin-bottom: 1rem;">ENTRENAMIENTO DE TRANSFERENCIA DE PUNTOS</p>
+                 <div id="certificate-recipient" class="recipient-name">Nombre del Receptor</div>
+                 <p class="acknowledgment">
+                     en reconocimiento a la finalización exitosa<br>del Entrenamiento de Transferencia de Puntos
+                 </p>
+                 <div class="footer">
+                     <div id="certificate-date" class="date">[Fecha]</div>
+                     </div>
+             </div>
+             <div class="text-center mt-6">
+                 <button onclick="downloadCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
+                    Descargar Certificado (PNG) <span class="lucide ml-2">&#xe919;</span> </button>
+                  <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
+                    Descargar Este Resultado (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                  <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                    Iniciar Nuevo Entrenamiento <span class="lucide ml-2">&#xe89b;</span> </button>
+             </div>
+        </div>
+
+         <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <p id="message-text" class="mb-4 text-gray-700"></p>
+                <button onclick="closeMessageBox()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
+                    Aceptar </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Firebase Configuration (remains the same) ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyAYdn17zrJgCvmartYmjTvRasY8LoWNsKA", // Replace
+          authDomain: "forklift-training-app-bb7c2.firebaseapp.com", // Replace
+          projectId: "forklift-training-app-bb7c2", // Replace
+          storageBucket: "forklift-training-app-bb7c2.appspot.com", // Replace
+          messagingSenderId: "283141747166", // Replace
+          appId: "1:283141747166:web:eb7ca8b7738e9b14a86d4f" // Replace
+        };
+        // --- End Firebase Configuration ---
+
+        // --- Initialize Firebase (remains the same) ---
+        let firestoreDb;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            firestoreDb = firebase.firestore();
+            console.log("Firebase initialized successfully using compat libraries.");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+        }
+
+        // --- Configuration (remains the same) ---
+        const PASSING_PERCENTAGE = 80;
+        const MAX_ATTEMPTS_PER_DAY = 3;
+        const ATTEMPT_WINDOW_HOURS = 24;
+
+        // --- Training Steps Data ---
+        // Titles and descriptions translated to Spanish
+        // scannerContent REMAINS IN ENGLISH
+        const trainingSteps = [
+             { title: "Paso 1: Seleccione el Tipo de Vehículo", description: "Primero, mire la pantalla y elija el Tipo de Vehículo según dónde esté trabajando. Por ejemplo, podría seleccionar 'REACH1' o 'REACH2'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: <span class="scanner-highlight">REACH2</span>\n Work Area:\n         ` },
+             { title: "Paso 2: Deje el Área de Trabajo Vacía y Presione Enter", description: "Después de seleccionar el Tipo de Vehículo, presione Enter. No necesita completar la sección 'Área de Trabajo'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: REACH2\n Work Area: <span class="scanner-highlight">[Leave Empty]</span>\n         ` },
+             { title: "Paso 3: Elija Trabajo Dirigido", description: "Aparecerá el 'Menú No Dirigido'. Seleccione la opción '8' para 'Menú de Trabajo Dirigido' y presione Enter.", scannerContent: `\n Undirected Menu\n 1 Picking Menu       7 Yard Menu\n 2 Inventory Menu     <span class="scanner-highlight">8 Directed Work</span>\n 3 Receiving Menu     9 Labor Statistics\n 4 Shipping Menu\n 5 Production Menu\n 6 Cycle Count Menu\n Enter Option: <span class="scanner-highlight">8</span>\n         ` },
+             { title: "Paso 4: Encuentre la Ubicación de Origen", description: "Espere al sistema. Le mostrará la 'Ubicación de Origen'. Aquí es donde necesita ir para recoger el pallet.", scannerContent: `\n Pickup Product At\n Source Location: <span class="scanner-highlight">2L46B</span>\n\n Press Enter To Acknowledge\n         ` },
+             { title: "Paso 5: Escanee el ULID (¡Use el Escáner!)", description: "Vaya a la Ubicación de Origen. Encuentre el pallet y escanee el número ULID impreso en él usando su PISTOLA ESCÁNER. El sistema debería completar los detalles del artículo automáticamente.\n\n<span class='font-bold text-red-600'>IMPORTANTE: Siempre use la pistola escáner para mayor precisión y velocidad. NO escriba el número manualmente a menos que sea absolutamente necesario y esté aprobado por un supervisor.</span>", scannerContent: `\n Wrk Order Pick\n Loc: 2L46B\n ID: <span class="scanner-highlight">001620182280</span>   <- Scan This with Gun!\n Itm: 90787527\n Lot: BLST FUS SKNGRD\n Q:   2160 EA\n         ` },
+             { title: "Paso 6: Verifique los Detalles", description: "IMPORTANTE: Compruebe que el número de Artículo y la Cantidad en la pantalla coincidan con el pallet real que recogió.", scannerContent: `\n Wrk Order Pick\n Loc: 2L46B\n ID:  001620182280\n Itm: <span class="scanner-highlight">90787527</span>      <- Verify\n Lot: BLST FUS SKNGRD\n Q:   <span class="scanner-highlight">2160 EA</span>      <- Verify\n         ` },
+             { title: "Paso 7: Encuentre la Ubicación de Depósito", description: "Presione Enter. La pantalla ahora le mostrará la 'Ubicación de Depósito'. Lleve el pallet a esta ubicación (p. ej., 2P17A).", scannerContent: `\n Product Deposit\n Lod: 00300474002721350824\n Itm: 80374707\n Q:   8100 EA\n Loc: <span class="scanner-highlight">2P17A</span>          <- Go Here\n\n Scan Location to Deposit\n         ` },
+             { title: "Paso 8: Escanee la Ubicación y Deposite", description: "Una vez que llegue a la ubicación de depósito correcta (p. ej., 2P17A), escanee la etiqueta de la ubicación para confirmar, luego deposite el pallet.", scannerContent: `\n Product Deposit\n Lod: 00300474002721350824\n Itm: 80374707\n Q:   8100 EA\n Loc: <span class="scanner-highlight">2P17A</span>          <- Scan this location label\n\n Deposit Complete!\n         ` },
+             { title: "Paso 9: Manejo de Anulaciones (Si es Necesario)", description: "Si no puede depositar el pallet (p. ej., la ubicación está llena), presione la tecla 'F4' para anular.", scannerContent: `\n Product Deposit\n Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>\n\n Cannot Deposit Here?\n         ` },
+             { title: "Paso 10: Seleccione el Motivo de Anulación", description: "Después de presionar F4, presione 'F2' para ver una lista de motivos. Seleccione el código de motivo correcto (p. ej., 'LF' para Ubicación Llena). Luego ingrese la nueva ubicación donde está colocando el pallet.", scannerContent: `\n Override Location\n Lod: 00100474091617976961\n Loc: 2L55B\n Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)\n Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location\n\n Press Enter\n         ` }
+        ];
+
+        // --- Quiz Questions Data ---
+        // Questions and options translated to Spanish
+        // correctAnswer updated to match the Spanish option text
+        const originalQuizQuestions = [
+            { question: "Cuando comienza, ¿qué es lo primero que necesita elegir en la pantalla?", options: ["Ubicación de Origen", "Tipo de Vehículo", "Menú de Trabajo Dirigido", "Número ULID"], correctAnswer: "Tipo de Vehículo" },
+            { question: "Después de elegir el vehículo, ¿qué opción del menú elige para obtener su tarea?", options: ["Menú de Picking", "Menú de Inventario", "Opción 8 (Trabajo Dirigido)", "Menú de Envío"], correctAnswer: "Opción 8 (Trabajo Dirigido)" },
+            { question: "¿Qué información le da el sistema *antes* de recoger físicamente el pallet?", options: ["Ubicación de Depósito", "Cantidad del Artículo", "Número ULID", "Ubicación de Origen"], correctAnswer: "Ubicación de Origen" },
+            { question: "¿Qué número específico impreso en el propio pallet debe ingresar en el sistema?", options: ["Número de Artículo", "Número de Lote", "Número ULID", "Código de Ubicación"], correctAnswer: "Número ULID" },
+            { question: "¿Cómo debería normalmente ingresar el número ULID en el sistema?", options: ["Escanearlo con la pistola", "Escribirlo manualmente", "Anotarlo primero", "Preguntar a un supervisor"], correctAnswer: "Escanearlo con la pistola" },
+            { question: "¿Qué tecla debe presionar si llega al lugar de entrega y el pallet no cabe o no se puede colocar allí?", options: ["Enter", "F1", "F2", "F4"], correctAnswer: "F4" },
+            { question: "Después de presionar F4 para una anulación, ¿qué tecla le ayuda a seleccionar el *motivo* de la anulación?", options: ["Enter", "F1", "F2", "F4"], correctAnswer: "F2" }
+        ];
+
+        // --- State Variables (remain the same) ---
+        let currentStep = 0;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let percentage = 0;
+        let currentShuffledQuestions = [];
+        let userAnswers = [];
+        let incorrectQuestions = [];
+        let firstName = '';
+        let lastName = '';
+        let xlcId = '';
+        let passStatus = '';
+        let attemptsToday = 0;
+
+        // --- DOM Elements (remain the same) ---
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const xlcIdInput = document.getElementById('xlcId');
+        const startTrainingButton = document.getElementById('start-training-button');
+        const trainingContainer = document.getElementById('training-container');
+        const stepContent = document.getElementById('step-content');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const quizButton = document.getElementById('quiz-button');
+        const stepIndicator = document.getElementById('step-indicator');
+        const quizContainer = document.getElementById('quiz-container');
+        const quizQuestionDiv = document.getElementById('quiz-question');
+        const nextQuestionButton = document.getElementById('next-question-button');
+        const submitQuizButton = document.getElementById('submit-quiz-button');
+        const resultsScreen = document.getElementById('results-screen');
+        const resultsTitle = document.getElementById('results-title');
+        const scoreDisplay = document.getElementById('score-display');
+        const resultsMessage = document.getElementById('results-message');
+        const resultsActions = document.getElementById('results-actions');
+        const downloadCsvButton = document.getElementById('download-csv-button');
+        const restartTrainingButtonFail = document.getElementById('restart-training-button-fail');
+        const downloadCsvButtonCert = document.getElementById('download-csv-button-cert');
+        const certificateScreen = document.getElementById('certificate-screen');
+        const certificateRecipient = document.getElementById('certificate-recipient');
+        const certificateDate = document.getElementById('certificate-date');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        // --- Helper Functions (remain the same, except for locale in date string if needed) ---
+
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            const newArray = [...array];
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [newArray[currentIndex], newArray[randomIndex]] = [
+                    newArray[randomIndex], newArray[currentIndex]];
+            }
+            return newArray;
+        }
+
+        // Using 'es-DO' for Dominican Republic Spanish date format, fallback 'es'
+        function getCurrentDateString(format = 'es-DO') {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            try {
+                 return new Date().toLocaleDateString(format, options);
+            } catch (e) {
+                 // Fallback to generic Spanish if locale is not supported
+                 console.warn(`Locale ${format} not supported, falling back to 'es'.`);
+                 return new Date().toLocaleDateString('es', options);
+            }
+        }
+
+        function getCurrentDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-CA'); // Keep YYYY-MM-DD for consistency in DB/CSV
+            const time = now.toLocaleTimeString('en-US', { hour12: false }); // Keep HH:MM:SS
+            return { date, time };
+        }
+
+        function getTimestampHoursAgo(hoursAgo) {
+            const date = new Date();
+            date.setHours(date.getHours() - hoursAgo);
+            return firebase.firestore.Timestamp.fromDate(date);
+        }
+
+        function showScreen(screenToShow) {
+            if (!screenToShow) { console.error("showScreen called with null/undefined screen"); return; }
+            welcomeScreen.classList.add('hidden');
+            trainingContainer.classList.add('hidden');
+            quizContainer.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            certificateScreen.classList.add('hidden');
+            screenToShow.classList.remove('hidden');
+            document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center');
+        }
+
+        // --- showMessage function with translated messages ---
+        function showMessage(messageKey, substitutions = {}) {
+             // Define messages in Spanish
+             const messages = {
+                 fill_fields: "Por favor, complete todos los campos: Nombre, Apellido e ID de XLC.",
+                 input_error: "Error: No se pudieron encontrar los campos de entrada.",
+                 select_answer: "Por favor, seleccione una respuesta antes de continuar.",
+                 select_final_answer: "Por favor, seleccione una respuesta para la última pregunta.",
+                 attempt_limit_reached: `Ha alcanzado el máximo de ${MAX_ATTEMPTS_PER_DAY} intentos permitidos en un período de ${ATTEMPT_WINDOW_HOURS} horas. Por favor, inténtelo de nuevo más tarde.`,
+                 attempt_check_error: "Error al verificar sus intentos anteriores. Por favor, inténtelo de nuevo.",
+                 db_connection_error: "Error: No se puede conectar a la base de datos para verificar intentos. Por favor, inténtelo de nuevo más tarde.",
+                 index_error: `Configuración de base de datos necesaria. Pida al administrador que cree el índice requerido en Firestore para la verificación de intentos. Detalles: ${substitutions.details || ''}`,
+                 load_training_error: "Error: No se pudieron cargar los pasos del entrenamiento.",
+                 load_quiz_error: "Error: No se pudo iniciar la prueba.",
+                 submit_error: "Ocurrió un error inesperado al enviar la prueba.",
+                 generate_cert_error: "No se pudo generar la imagen del certificado.",
+                 download_lib_error: "La biblioteca de descarga del certificado o el elemento no se encontraron.",
+                 csv_unsupported: "La descarga de CSV no es compatible con su navegador.",
+                 log_results_error: "No se pudieron guardar los resultados en la base de datos, pero se muestra su resultado.",
+                 log_results_success: "Resultados de la prueba guardados.", // Optional: can be shown if needed
+                 firestore_init_error: "Error Crítico: No se pudo conectar a los servicios requeridos.",
+                 firestore_init_fail_log: "Error: No se puede conectar al servicio de base de datos. El registro de resultados no estará disponible.",
+                 element_missing_error: `Error: La aplicación no pudo inicializarse. Falta un elemento requerido ('${substitutions.elementId || 'Desconocido'}').`
+
+             };
+
+             let finalMessage = messages[messageKey] || messageKey; // Use the key itself as fallback
+
+             if(messageText && messageBox){
+                 messageText.textContent = finalMessage;
+                 messageBox.classList.remove('hidden');
+             } else {
+                 console.error("Message box elements not found");
+                 alert(finalMessage);
+             }
+        }
+
+
+        function closeMessageBox() {
+            if(messageBox) messageBox.classList.add('hidden');
+        }
+
+        function downloadCertificate() {
+            const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate');
+            if (typeof html2canvas !== 'undefined' && html2canvas && certificateElement) {
+                html2canvas(certificateElement, {
+                    scale: 2, useCORS: true, backgroundColor: '#fefce8'
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    // Keep filename structure, maybe add _ES
+                    link.download = `Certificado_Montacargas_${firstName}_${lastName}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error("Error generating certificate image:", err);
+                    showMessage('generate_cert_error');
+                });
+            } else {
+                showMessage('download_lib_error');
+            }
+        }
+
+        function downloadResults() {
+            const { date, time } = getCurrentDateTime();
+            // Keep CSV headers in English for database/processing consistency
+            const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,IncorrectQuestions\n";
+            const escapeCSV = (field) => `"${String(field).replace(/"/g, '""')}"`;
+            const safeFirstName = escapeCSV(firstName);
+            const safeLastName = escapeCSV(lastName);
+            const safeXlcId = escapeCSV(xlcId);
+            // Translate Pass/Fail status for the CSV data if desired, or keep English
+            const translatedPassStatus = passStatus === 'Pass' ? 'Aprobado' : 'Falló';
+            const incorrectQuestionsStr = escapeCSV(incorrectQuestions.join('; ')); // Questions themselves are already translated
+            // Using translatedPassStatus in the data row
+            const csvData = `${escapeCSV(date)},${escapeCSV(time)},${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},${escapeCSV(translatedPassStatus)},${incorrectQuestionsStr}\n`;
+            const csvContent = csvHeader + csvData;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                const dateStr = date;
+                 // Keep filename structure, maybe add _ES
+                link.setAttribute("download", `Resultado_Prueba_Montacargas_${xlcId}_${dateStr}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                showMessage('csv_unsupported');
+            }
+        }
+
+
+        // --- Core Logic Functions (Logic remains the same, messages translated via showMessage) ---
+
+        async function startTraining() {
+            console.log("startTraining called");
+            if (startTrainingButton) startTrainingButton.disabled = true;
+
+            if (!firstNameInput || !lastNameInput || !xlcIdInput) {
+                showMessage('input_error');
+                console.error("Input elements missing in startTraining");
+                 if (startTrainingButton) startTrainingButton.disabled = false;
+                return;
+            }
+
+            const fname = firstNameInput.value.trim();
+            const lname = lastNameInput.value.trim();
+            const id = xlcIdInput.value.trim();
+
+            if (!fname || !lname || !id) {
+                showMessage('fill_fields');
+                 if (startTrainingButton) startTrainingButton.disabled = false;
+                return;
+            }
+
+            firstName = fname;
+            lastName = lname;
+            xlcId = id;
+
+            if (typeof firestoreDb === 'undefined' || !firestoreDb) {
+                showMessage('db_connection_error');
+                console.error("Firestore not initialized in startTraining");
+                 if (startTrainingButton) startTrainingButton.disabled = false;
+                return;
+            }
+
+            const timeLimit = getTimestampHoursAgo(ATTEMPT_WINDOW_HOURS);
+            console.log(`Checking attempts for XLC_ID: ${xlcId} since ${timeLimit.toDate()}`);
+
+            try {
+                const querySnapshot = await firestoreDb.collection("quizResults")
+                    .where("xlcId", "==", xlcId)
+                    .where("timestamp", ">=", timeLimit)
+                    .get();
+
+                attemptsToday = querySnapshot.size;
+                console.log(`Found ${attemptsToday} attempts in the last ${ATTEMPT_WINDOW_HOURS} hours.`);
+
+                if (attemptsToday >= MAX_ATTEMPTS_PER_DAY) {
+                    showMessage('attempt_limit_reached');
+                    if (startTrainingButton) startTrainingButton.disabled = false;
+                    return;
+                }
+
+                currentStep = 0;
+                console.log("User details set and attempt limit checked:", firstName, lastName, xlcId);
+
+                const targetScreen = document.getElementById('training-container');
+                if(targetScreen){
+                    console.log("Attempting to show training container...");
+                    showScreen(targetScreen);
+                    displayStep(currentStep);
+                } else {
+                    console.error("Training container element not found!");
+                    showMessage('load_training_error');
+                }
+
+            } catch (error) {
+                console.error("Error checking quiz attempts:", error);
+                if (error.message && error.message.includes("indexes?")) {
+                     showMessage('index_error', { details: error.message });
+                } else {
+                    showMessage('attempt_check_error');
+                }
+                if (startTrainingButton) startTrainingButton.disabled = false;
+                return;
+            }
+             if (startTrainingButton) startTrainingButton.disabled = false;
+        }
+
+        function displayStep(stepIndex) {
+             if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
+             if (!stepContent) { console.error("stepContent element not found!"); return; }
+
+             const step = trainingSteps[stepIndex];
+             if (!step || !step.title || !step.description || typeof step.scannerContent === 'undefined') {
+                 console.error("Invalid step data for index:", stepIndex, step);
+                 stepContent.innerHTML = '<p class="text-red-500">Error al cargar el contenido del paso.</p>'; // Error message in Spanish
+                 return;
+             }
+            // Indicator text updated for Spanish ("Paso")
+             stepIndicator.textContent = `Paso ${stepIndex + 1} / ${trainingSteps.length}`;
+             prevButton.disabled = stepIndex === 0;
+             prevButton.classList.toggle('opacity-50', stepIndex === 0);
+             prevButton.classList.toggle('cursor-not-allowed', stepIndex === 0);
+
+             if (stepIndex === trainingSteps.length - 1) {
+                 nextButton.classList.add('hidden');
+                 quizButton.classList.remove('hidden');
+             } else {
+                 nextButton.classList.remove('hidden');
+                 quizButton.classList.add('hidden');
+             }
+
+             stepContent.classList.remove('fade-in');
+             void stepContent.offsetWidth;
+             stepContent.classList.add('fade-in');
+             // Use translated title and description, keep scannerContent English
+             stepContent.innerHTML = `
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2>
+                <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p>
+                <div class="scanner-screen">${step.scannerContent.trim()}</div>
+             `;
+        }
+
+        function nextStep() {
+            console.log("nextStep called");
+            if (currentStep < trainingSteps.length - 1) {
+                currentStep++;
+                displayStep(currentStep);
+            }
+        }
+
+        function prevStep() {
+            console.log("prevStep called");
+            if (currentStep > 0) {
+                currentStep--;
+                displayStep(currentStep);
+            }
+        }
+
+        function startQuiz() {
+            console.log("startQuiz called");
+            currentShuffledQuestions = shuffleArray(originalQuizQuestions); // Use translated questions
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentShuffledQuestions.length).fill(null);
+            incorrectQuestions = [];
+            score = 0;
+            percentage = 0;
+            passStatus = '';
+
+            const targetScreen = document.getElementById('quiz-container');
+            if (targetScreen) {
+                 showScreen(targetScreen);
+                 displayQuestion(currentQuestionIndex);
+                 if(submitQuizButton) submitQuizButton.classList.add('hidden');
+                 if(nextQuestionButton) nextQuestionButton.classList.remove('hidden');
+            } else {
+                 console.error("Quiz container element not found!");
+                 showMessage('load_quiz_error');
+            }
+        }
+
+        function displayQuestion(index) {
+            if (index < 0 || index >= currentShuffledQuestions.length) return;
+            if (!quizQuestionDiv) { console.error("quizQuestionDiv element not found!"); return; }
+
+            const q = currentShuffledQuestions[index]; // Will be the translated question object
+            if (!q || !q.question || !Array.isArray(q.options)) {
+                console.error("Invalid question data for index:", index, q);
+                quizQuestionDiv.innerHTML = '<p class="text-red-500">Error al cargar la pregunta.</p>'; // Error in Spanish
+                return;
+            }
+            // Question number included
+            let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p><div class="space-y-3">`;
+            q.options.forEach((option) => { // Options are already translated
+                const escapedOption = String(option).replace(/'/g, "\\'");
+                const isSelected = userAnswers[index] === option;
+                optionsHtml += `
+                    <div
+                        class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}"
+                        onclick="selectAnswer(${index}, '${escapedOption}')">
+                        ${option}
+                    </div>
+                `;
+            });
+            optionsHtml += '</div>';
+            quizQuestionDiv.innerHTML = optionsHtml;
+
+            if(index === currentShuffledQuestions.length - 1) {
+                 if(nextQuestionButton) nextQuestionButton.classList.add('hidden');
+                 if(submitQuizButton) submitQuizButton.classList.remove('hidden');
+            } else {
+                 if(nextQuestionButton) nextQuestionButton.classList.remove('hidden');
+                 if(submitQuizButton) submitQuizButton.classList.add('hidden');
+            }
+
+            quizQuestionDiv.classList.remove('fade-in');
+            void quizQuestionDiv.offsetWidth;
+            quizQuestionDiv.classList.add('fade-in');
+        }
+
+        function selectAnswer(questionIndex, answer) {
+            userAnswers[questionIndex] = answer;
+            displayQuestion(questionIndex);
+        }
+
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] === null) {
+                showMessage('select_answer');
+                return;
+            }
+            if (currentQuestionIndex < currentShuffledQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+
+        function submitQuiz() {
+            console.log("submitQuiz called");
+            if (!submitQuizButton) { console.error("Submit button not found"); return; }
+
+            submitQuizButton.disabled = true;
+            // Button text in Spanish
+            submitQuizButton.textContent = 'Enviando...';
+
+            try {
+                if (userAnswers[currentQuestionIndex] === null) {
+                    showMessage('select_final_answer');
+                    submitQuizButton.disabled = false;
+                    submitQuizButton.textContent = 'Enviar Respuestas'; // Reset text
+                    return;
+                }
+
+                score = 0;
+                incorrectQuestions = [];
+                userAnswers.forEach((answer, index) => {
+                    if (currentShuffledQuestions[index]) {
+                         // Comparison uses the translated correctAnswer from the question object
+                        if (answer === currentShuffledQuestions[index].correctAnswer) {
+                            score++;
+                        } else if (currentShuffledQuestions[index].question) {
+                            incorrectQuestions.push(currentShuffledQuestions[index].question); // Store the translated question text
+                        }
+                    } else {
+                        console.warn("Issue comparing answer for question index:", index, "- Question data missing.");
+                    }
+                });
+
+                percentage = currentShuffledQuestions.length > 0 ? Math.round((score / currentShuffledQuestions.length) * 100) : 0;
+                // Keep internal status English, translate for display only
+                passStatus = percentage >= PASSING_PERCENTAGE ? 'Pass' : 'Fail';
+                attemptsToday++;
+
+                console.log(`Quiz submitted: Score=${score}, Percentage=${percentage}, Status=${passStatus}, Attempt# ${attemptsToday}`);
+
+                logQuizResult()
+                    .then(() => {
+                        console.log("logQuizResult finished successfully.");
+                        if (passStatus === 'Pass') {
+                            displayCertificate();
+                        } else {
+                            displayFailScreen();
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error logging result to Firestore:", error);
+                         showMessage('log_results_error');
+                        if (passStatus === 'Pass') {
+                            displayCertificate();
+                        } else {
+                            displayFailScreen();
+                        }
+                    })
+                    .finally(() => {
+                        submitQuizButton.disabled = false;
+                        submitQuizButton.textContent = 'Enviar Respuestas'; // Reset text
+                    });
+
+            } catch (error) {
+                console.error("Error occurred in submitQuiz function:", error);
+                showMessage('submit_error');
+                submitQuizButton.disabled = false;
+                submitQuizButton.textContent = 'Enviar Respuestas'; // Reset text
+            }
+        }
+
+
+        function displayCertificate() {
+            console.log("displayCertificate called");
+            if (!certificateScreen || !certificateRecipient || !certificateDate) {
+                console.error("Certificate screen elements not found!");
+                return;
+            }
+            certificateRecipient.textContent = `${firstName} ${lastName}`;
+            certificateDate.textContent = getCurrentDateString(); // Use Spanish date format
+            showScreen(certificateScreen);
+        }
+
+        function displayFailScreen() {
+            console.log(`displayFailScreen called, attemptsToday: ${attemptsToday}`);
+            if (!resultsScreen || !resultsTitle || !scoreDisplay || !resultsMessage || !restartTrainingButtonFail) {
+                console.error("Results screen elements not found!");
+                return;
+            }
+            // Title translated
+            resultsTitle.textContent = "Resultados de la Prueba";
+            // Labels translated, status translated
+            const displayStatus = passStatus === 'Pass' ? 'Aprobado' : 'Falló';
+            scoreDisplay.innerHTML = `
+                Usuario: <span class="font-bold">${firstName} ${lastName}</span> (ID: ${xlcId})<br>
+                Puntuación: <span class="font-bold">${score} / ${currentShuffledQuestions.length}</span><br>
+                Porcentaje: <span class="font-bold text-red-600">${percentage}%</span><br>
+                Estado: <span class="font-bold text-red-600">${displayStatus}</span> (Requerido: ${PASSING_PERCENTAGE}%)
+            `;
+
+            if (attemptsToday >= MAX_ATTEMPTS_PER_DAY) {
+                resultsMessage.textContent = `No alcanzó la puntuación requerida y ha llegado al máximo de ${MAX_ATTEMPTS_PER_DAY} intentos por hoy. Por favor, inténtelo de nuevo más tarde.`;
+                restartTrainingButtonFail.disabled = true;
+                // Tooltip in Spanish
+                restartTrainingButtonFail.title = `Máximo de intentos alcanzado. Intente de nuevo después de ${ATTEMPT_WINDOW_HOURS} horas.`;
+            } else {
+                const remainingAttempts = MAX_ATTEMPTS_PER_DAY - attemptsToday;
+                // Message in Spanish
+                resultsMessage.textContent = `No alcanzó la puntuación requerida de ${PASSING_PERCENTAGE}%. Por favor, revise el material de entrenamiento cuidadosamente. Le queda(n) ${remainingAttempts} intento(s) hoy.`;
+                restartTrainingButtonFail.disabled = false;
+                 restartTrainingButtonFail.title = '';
+            }
+
+            showScreen(resultsScreen);
+        }
+
+        // logQuizResult remains the same - sends English field names to Firestore
+        function logQuizResult() {
+            console.log("logQuizResult called");
+            return new Promise((resolve, reject) => {
+                if (typeof firestoreDb === 'undefined' || !firestoreDb) {
+                    const errorMsg = "Firestore not initialized! Cannot log results.";
+                    console.error(errorMsg);
+                    reject(new Error(errorMsg));
+                    return;
+                }
+                const { date, time } = getCurrentDateTime();
+                const resultData = {
+                    quizDate: date, quizTime: time, firstName: firstName, lastName: lastName, xlcId: xlcId,
+                    quizScore: score, quizPercentage: percentage, passFail: passStatus, // Keep Pass/Fail English internally
+                    incorrectQuestions: incorrectQuestions, // These question strings are already translated
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                console.log("Adding document to Firestore collection 'quizResults':", resultData);
+                firestoreDb.collection("quizResults").add(resultData)
+                    .then((docRef) => {
+                        console.log("Document written with ID: ", docRef.id);
+                        resolve(docRef);
+                    })
+                    .catch((error) => {
+                        console.error("Error adding document to Firestore: ", error);
+                        reject(error); // Reject the promise for submitQuiz to handle
+                    });
+            });
+        }
+
+        function restartTraining() {
+            console.log("restartTraining called");
+            if (firstNameInput) firstNameInput.value = '';
+            if (lastNameInput) lastNameInput.value = '';
+            if (xlcIdInput) xlcIdInput.value = '';
+            firstName = ''; lastName = ''; xlcId = '';
+            currentStep = 0; currentQuestionIndex = 0;
+            userAnswers = []; score = 0; percentage = 0; passStatus = '';
+            currentShuffledQuestions = []; incorrectQuestions = [];
+            attemptsToday = 0;
+            if (startTrainingButton) startTrainingButton.disabled = false;
+            if (restartTrainingButtonFail) restartTrainingButtonFail.disabled = false;
+            if (welcomeScreen) showScreen(welcomeScreen);
+        }
+
+        // --- Initial Setup (Logic remains same, uses translated messages) ---
+        function initializeApp() {
+            const essentialElements = [
+                welcomeScreen, firstNameInput, lastNameInput, xlcIdInput, startTrainingButton,
+                trainingContainer, stepContent, prevButton, nextButton, quizButton, stepIndicator,
+                quizContainer, quizQuestionDiv, nextQuestionButton, submitQuizButton,
+                resultsScreen, resultsTitle, scoreDisplay, resultsMessage, resultsActions, downloadCsvButton, restartTrainingButtonFail,
+                certificateScreen, certificateRecipient, certificateDate, downloadCsvButtonCert,
+                messageBox, messageText
+            ];
+            const missingElement = essentialElements.find(el => !el);
+            if (missingElement) {
+                const missingId = essentialElements.reduce((acc, el, index) => {
+                    if (!el && !acc) {
+                        const ids = [
+                            'welcome-screen', 'firstName', 'lastName', 'xlcId', 'start-training-button',
+                            'training-container', 'step-content', 'prev-button', 'next-button', 'quiz-button', 'step-indicator',
+                            'quiz-container', 'quiz-question', 'next-question-button', 'submit-quiz-button',
+                            'results-screen', 'results-title', 'score-display', 'results-message', 'results-actions', 'download-csv-button', 'restart-training-button-fail',
+                            'certificate-screen', 'certificate-recipient', 'certificate-date', 'download-csv-button-cert',
+                            'message-box', 'message-text'
+                        ];
+                        return ids[index] || 'Unknown Element';
+                    }
+                    return acc;
+                }, null);
+                console.error(`Initialization failed: Element with ID '${missingId || 'Unknown'}' not found.`);
+                 // Show error using the message function if possible, otherwise raw HTML
+                 if (typeof showMessage === 'function') {
+                    showMessage('element_missing_error', { elementId: missingId });
+                 } else {
+                    document.body.innerHTML = `<p style="color: red; text-align: center; padding: 20px;">Error: La aplicación no pudo inicializarse. Falta un elemento requerido ('${missingId || 'Desconocido'}').</p>`;
+                 }
+                return false;
+            }
+            console.log("All essential application elements found.");
+            return true;
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log("DOM fully loaded and parsed");
+            if (typeof firestoreDb !== 'undefined' && initializeApp()) {
+                console.log("App initialized successfully.");
+                showScreen(welcomeScreen);
+            } else if (typeof firestoreDb === 'undefined') {
+                console.error("Firestore DB was not initialized. App cannot fully function.");
+                if (initializeApp()) { // Check elements before showing message
+                    showMessage('firestore_init_fail_log');
+                    showScreen(welcomeScreen); // Still show welcome screen
+                } else {
+                     console.error("Cannot show welcome screen due to missing elements.")
+                }
+            } else {
+                console.error("App initialization failed due to missing DOM elements.");
+                 // initializeApp already displayed an error message
+            }
+        });
+
+    </script>
+
+</body>
+</html>
