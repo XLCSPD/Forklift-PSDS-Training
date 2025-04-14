@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forklift Point Transfer Training</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+      /* Font face for Lucide Icons (used for icons) */
+      @font-face {
+        font-family: 'LucideIcons';
+        src: url(https://cdn.jsdelivr.net/npm/lucide-static@latest/font/Lucide.ttf) format('truetype');
+      }
+      /* Base style for Lucide icons */
+      .lucide { font-family: 'LucideIcons'; font-style: normal; font-weight: normal; font-variant: normal; text-rendering: auto; line-height: 1; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+
+      /* Fade-in animation */
+      .fade-in { animation: fadeIn 0.5s ease-in-out; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+      /* Styles for the simulated scanner screen */
+      .scanner-screen { font-family: monospace; background-color: #c8e6c9; /* Light green */ color: #004d40; /* Dark green text */ border: 4px solid #388e3c; /* Medium green border */ padding: 15px; border-radius: 8px; min-height: 200px; white-space: pre; /* Preserve whitespace and line breaks */ line-height: 1.4; overflow-x: auto; /* Allow horizontal scroll if needed */ }
+      .scanner-highlight { background-color: #fff59d; /* Light yellow highlight */ font-weight: bold; padding: 2px; border-radius: 3px; }
+
+      /* Styles for quiz options */
+      .quiz-option { cursor: pointer; transition: background-color 0.2s ease-in-out; border: 2px solid #d1d5db; /* Gray border */ }
+      .quiz-option.selected { background-color: #bbdefb; /* Light blue selected */ border-color: #1976d2; /* Darker blue border */ }
+
+      /* Basic body and font setup */
+      html, body { height: 100%; margin: 0; }
+      body { font-family: 'Inter', sans-serif; }
+
+      /* Certificate Styles */
+      .certificate { border: 10px solid #facc15; /* Yellow border */ background-color: #fefce8; /* Light yellow background */ padding: 2rem 3rem; text-align: center; max-width: 600px; margin: auto; position: relative; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+      .certificate h2 { font-size: 1.8rem; font-weight: bold; color: #1f2937; /* Dark gray */ margin-bottom: 0.5rem; letter-spacing: 1px; }
+      .certificate .subtitle { font-size: 1.1rem; font-weight: 600; color: #ca8a04; /* Dark yellow */ margin-bottom: 2rem; text-transform: uppercase; }
+      .certificate .recipient-name { font-size: 2rem; font-weight: bold; color: #1f2937; margin-bottom: 1rem; border-bottom: 2px solid #facc15; display: inline-block; padding-bottom: 0.5rem; }
+      .certificate .acknowledgment { font-size: 0.9rem; color: #4b5563; /* Medium gray */ margin-bottom: 2.5rem; }
+      .certificate .footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 2rem; }
+      .certificate .date { font-size: 0.9rem; color: #4b5563; }
+      /* Decorative corner elements for certificate */
+      .certificate::before, .certificate::after { content: ''; position: absolute; width: 50px; height: 50px; background-color: #f3f4f6; /* Light gray background */ border-radius: 50%; z-index: -1; }
+      .certificate::before { top: -25px; left: -25px; }
+      .certificate::after { top: -25px; right: -25px; }
+
+      /* Container for each screen (adds padding for logo) */
+      .screen-container { position: relative; padding-top: 60px; /* Space for the logo */ }
+
+      /* Logo positioning and styling */
+      .logo-container { position: absolute; top: 1rem; right: 1rem; line-height: 1; text-align: right; }
+      .logo-xlc { display: block; font-weight: 900; font-size: 2.25rem; letter-spacing: -0.025em; color: #000000; }
+      .logo-services { display: block; font-weight: 500; font-size: 0.75rem; letter-spacing: 0.2em; color: #4b5563; margin-top: -4px; }
+
+      /* Style for disabled button */
+       button:disabled {
+           opacity: 0.6;
+           cursor: not-allowed;
+       }
+    </style>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white p-6 md:p-8 rounded-lg shadow-xl w-full max-w-3xl">
+
+        <div class="logo-container">
+            <span class="logo-xlc">XLC</span>
+            <span class="logo-services">SERVICES</span>
+        </div>
+
+        <div id="welcome-screen" class="fade-in screen-container">
+             <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-4 text-center pt-8">Forklift Point Transfer Training</h1>
+            <p class="text-gray-600 mb-6 text-center">Learn the steps for using the scanner for directed work orders. Please enter your details below.</p>
+            <div class="space-y-4 max-w-md mx-auto">
+                <div>
+                    <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">First Name:</label>
+                    <input type="text" id="firstName" name="firstName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Last Name:</label>
+                    <input type="text" id="lastName" name="lastName" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+                <div>
+                    <label for="xlcId" class="block text-sm font-medium text-gray-700 mb-1">XLC_ID:</label>
+                    <input type="text" id="xlcId" name="xlcId" required class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                </div>
+            </div>
+            <div class="text-center mt-6">
+                <button id="start-training-button" onclick="startTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                    Start Training <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="training-container" class="hidden screen-container">
+            <div id="step-content" class="mb-6 fade-in"></div>
+            <div class="flex justify-between items-center mt-6">
+                <button id="prev-button" onclick="prevStep()" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center" disabled>
+                    <span class="lucide mr-2">&#xea3a;</span> Prev </button>
+                <span id="step-indicator" class="text-sm text-gray-500">Step 1 / X</span>
+                <button id="next-button" onclick="nextStep()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out flex items-center">
+                    Next <span class="lucide ml-2">&#xea3c;</span> </button>
+                <button id="quiz-button" onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg shadow transition duration-200 ease-in-out hidden">
+                    Start Quiz <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="quiz-container" class="hidden screen-container">
+             <div class="flex justify-between items-center mb-3">
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800">Knowledge Check</h2>
+                </div>
+            <div id="quiz-question" class="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50 fade-in"></div>
+            <div class="text-center">
+                 <button id="submit-quiz-button" onclick="submitQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out hidden">
+                    Submit Answers
+                 </button>
+                 <button id="next-question-button" onclick="nextQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
+                    Next Question <span class="lucide ml-2">&#xea3c;</span> </button>
+            </div>
+        </div>
+
+        <div id="results-screen" class="hidden text-center fade-in screen-container">
+            <h2 id="results-title" class="text-xl md:text-2xl font-bold text-gray-800 mb-4">Quiz Results</h2>
+            <div id="score-display" class="text-lg text-gray-700 mb-6 bg-red-100 border border-red-300 p-4 rounded-md"></div>
+            <p id="results-message" class="text-gray-600 mb-6">Please review the training material again.</p>
+            <div id="results-actions" class="flex flex-col sm:flex-row justify-center items-center space-y-3 sm:space-y-0 sm:space-x-4">
+                 <button onclick="downloadResults()" id="download-csv-button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Download This Result (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                <button onclick="restartTraining()" id="restart-training-button-fail" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center w-full sm:w-auto">
+                    Restart Training <span class="lucide ml-2">&#xe89b;</span> </button>
+            </div>
+        </div>
+
+         <div id="certificate-screen" class="hidden fade-in screen-container">
+             <div class="certificate">
+                 <h2>CERTIFICATE</h2>
+                 <p class="subtitle">OF COMPLETION</p>
+                 <p class="subtitle" style="margin-bottom: 1rem;">POINT TRANSFER TRAINING</p>
+                 <div id="certificate-recipient" class="recipient-name">Recipient Name</div>
+                 <p class="acknowledgment">
+                     in acknowledgment of successful completion<br>of the Point Transfer Training
+                 </p>
+                 <div class="footer">
+                     <div id="certificate-date" class="date">[Date]</div>
+                     </div>
+             </div>
+             <div class="text-center mt-6">
+                 <button onclick="downloadCertificate()" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
+                    Download Certificate (PNG) <span class="lucide ml-2">&#xe919;</span> </button>
+                  <button onclick="downloadResults()" id="download-csv-button-cert" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto mb-3">
+                    Download This Result (CSV) <span class="lucide ml-2">&#xe919;</span> </button>
+                  <button onclick="restartTraining()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out flex items-center justify-center mx-auto">
+                    Start New Training <span class="lucide ml-2">&#xe89b;</span> </button>
+             </div>
+        </div>
+
+         <div id="message-box" class="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 hidden z-50">
+            <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full text-center">
+                <p id="message-text" class="mb-4 text-gray-700"></p>
+                <button onclick="closeMessageBox()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition duration-200 ease-in-out">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Firebase Configuration ---
+        // IMPORTANT: Replace with your actual Firebase project configuration
+        // These are placeholder values and will not connect to a real database.
+        const firebaseConfig = {
+          apiKey: "AIzaSyAYdn17zrJgCvmartYmjTvRasY8LoWNsKA", // Replace
+          authDomain: "forklift-training-app-bb7c2.firebaseapp.com", // Replace
+          projectId: "forklift-training-app-bb7c2", // Replace
+          storageBucket: "forklift-training-app-bb7c2.appspot.com", // Replace
+          messagingSenderId: "283141747166", // Replace
+          appId: "1:283141747166:web:eb7ca8b7738e9b14a86d4f" // Replace
+        };
+        // --- End Firebase Configuration ---
+
+        // --- Initialize Firebase ---
+        let firestoreDb;
+        try {
+            // Initialize Firebase App using compatibility library
+            firebase.initializeApp(firebaseConfig);
+            // Get Firestore instance using compatibility library
+            firestoreDb = firebase.firestore();
+            console.log("Firebase initialized successfully using compat libraries.");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            // Optionally show an error message to the user if Firebase is critical
+            // showMessage("Critical Error: Could not connect to required services.");
+        }
+
+        // --- Configuration ---
+        const PASSING_PERCENTAGE = 80; // Minimum percentage to pass the quiz
+        const MAX_ATTEMPTS_PER_DAY = 3; // Maximum attempts allowed in 24 hours
+        const ATTEMPT_WINDOW_HOURS = 24; // Time window for attempt limit
+
+        // --- Training Steps Data ---
+        const trainingSteps = [
+             { title: "Step 1: Select Vehicle Type", description: "First, look at the screen and choose the Vehicle Type based on where you are working. For example, you might select 'REACH1' or 'REACH2'.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: <span class="scanner-highlight">REACH2</span>\n Work Area:\n         ` },
+             { title: "Step 2: Leave Work Area Empty & Enter", description: "After selecting the Vehicle Type, press Enter. You don't need to fill in the 'Work Area' section.", scannerContent: `\n Work Information\n Warehouse ID: AO\n Loc: 2M01\n Vehicle Type: REACH2\n Work Area: <span class="scanner-highlight">[Leave Empty]</span>\n         ` },
+             { title: "Step 3: Choose Directed Work", description: "The 'Undirected Menu' will appear. Select option '8' for 'Directed Work Menu' and press Enter.", scannerContent: `\n Undirected Menu\n 1 Picking Menu       7 Yard Menu\n 2 Inventory Menu     <span class="scanner-highlight">8 Directed Work</span>\n 3 Receiving Menu     9 Labor Statistics\n 4 Shipping Menu\n 5 Production Menu\n 6 Cycle Count Menu\n Enter Option: <span class="scanner-highlight">8</span>\n         ` },
+             { title: "Step 4: Find the Source Location", description: "Wait for the system. It will show you the 'Source Location'. This is where you need to go to pick up the pallet.", scannerContent: `\n Pickup Product At\n Source Location: <span class="scanner-highlight">2L46B</span>\n\n Press Enter To Acknowledge\n         ` },
+             { title: "Step 5: Scan the ULID (Use the Scanner!)", description: "Go to the Source Location. Find the pallet and scan the ULID number printed on it using your SCAN GUN. The system should fill in the item details automatically. \n\n<span class='font-bold text-red-600'>IMPORTANT: Always use the scanner gun for accuracy and speed. DO NOT type the number manually unless absolutely necessary and approved by a supervisor.</span>", scannerContent: `\n Wrk Order Pick\n Loc: 2L46B\n ID: <span class="scanner-highlight">001620182280</span>   <- Scan This with Gun!\n Itm: 90787527\n Lot: BLST FUS SKNGRD\n Q:   2160 EA\n         ` },
+             { title: "Step 6: Verify Details", description: "IMPORTANT: Check that the Item number and Quantity on the screen match the actual pallet you picked up.", scannerContent: `\n Wrk Order Pick\n Loc: 2L46B\n ID:  001620182280\n Itm: <span class="scanner-highlight">90787527</span>      <- Verify\n Lot: BLST FUS SKNGRD\n Q:   <span class="scanner-highlight">2160 EA</span>      <- Verify\n         ` },
+             { title: "Step 7: Find Deposit Location", description: "Press Enter. The screen will now show you the 'Deposit Location'. Take the pallet to this location (e.g., 2P17A).", scannerContent: `\n Product Deposit\n Lod: 00300474002721350824\n Itm: 80374707\n Q:   8100 EA\n Loc: <span class="scanner-highlight">2P17A</span>          <- Go Here\n\n Scan Location to Deposit\n         ` },
+             { title: "Step 8: Scan Location & Deposit", description: "Once you arrive at the correct deposit location (e.g., 2P17A), scan the location label to confirm, then deposit the pallet.", scannerContent: `\n Product Deposit\n Lod: 00300474002721350824\n Itm: 80374707\n Q:   8100 EA\n Loc: <span class="scanner-highlight">2P17A</span>          <- Scan this location label\n\n Deposit Complete!\n         ` },
+             { title: "Step 9: Handling Overrides (If Needed)", description: "If you can't deposit the pallet (e.g., location is full), press the 'F4' key to override.", scannerContent: `\n Product Deposit\n Loc: 2P17A          <span class="scanner-highlight">[Press F4]</span>\n\n Cannot Deposit Here?\n         ` },
+             { title: "Step 10: Select Override Reason", description: "After pressing F4, press 'F2' to see a list of reasons. Select the correct reason code (e.g., 'LF' for Location Full). Then enter the new location where you are placing the pallet.", scannerContent: `\n Override Location\n Lod: 00100474091617976961\n Loc: 2L55B\n Override Code: <span class="scanner-highlight">LF</span> <- Select Reason (F2)\n Loc: <span class="scanner-highlight">[Enter New Location]</span> <- Type new location\n\n Press Enter\n         ` }
+        ];
+
+        // --- Quiz Questions Data ---
+        const originalQuizQuestions = [
+            { question: "When you start, what's the first thing you need to choose on the screen?", options: ["Source Location", "Vehicle Type", "Directed Work Menu", "ULID Number"], correctAnswer: "Vehicle Type" },
+            { question: "After picking the vehicle, what menu option do you choose to get your task?", options: ["Picking Menu", "Inventory Menu", "Option 8 (Directed Work)", "Shipping Menu"], correctAnswer: "Option 8 (Directed Work)" },
+            { question: "What information does the system give you *before* you physically pick up the pallet?", options: ["Deposit Location", "Item Quantity", "ULID Number", "Source Location"], correctAnswer: "Source Location" },
+            { question: "What specific number printed on the pallet itself should you input into the system?", options: ["Item Number", "Lot Number", "ULID number", "Location Code"], correctAnswer: "ULID number" },
+            { question: "How should you normally enter the ULID number into the system?", options: ["Scan it with the gun", "Type it manually", "Write it down first", "Ask a supervisor"], correctAnswer: "Scan it with the gun" },
+            { question: "What key should you press if you get to the drop-off spot and the pallet won't fit or can't be placed there?", options: ["Enter", "F1", "F2", "F4"], correctAnswer: "F4" },
+            { question: "After pressing F4 for an override, which key helps you select the *reason* for the override?", options: ["Enter", "F1", "F2", "F4"], correctAnswer: "F2" }
+        ];
+
+        // --- State Variables ---
+        let currentStep = 0; // Index of the current training step
+        let currentQuestionIndex = 0; // Index of the current quiz question
+        let score = 0; // User's quiz score
+        let percentage = 0; // User's quiz percentage
+        let currentShuffledQuestions = []; // Array to hold shuffled quiz questions for the current session
+        let userAnswers = []; // Array to store the user's selected answers
+        let incorrectQuestions = []; // Array to store the questions answered incorrectly
+        let firstName = ''; // User's first name
+        let lastName = ''; // User's last name
+        let xlcId = ''; // User's XLC ID
+        let passStatus = ''; // 'Pass' or 'Fail'
+        let attemptsToday = 0; // Counter for attempts within the time window
+
+        // --- DOM Elements ---
+        // Get references to all the major screen divs and interactive elements
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const xlcIdInput = document.getElementById('xlcId');
+        const startTrainingButton = document.getElementById('start-training-button'); // Get reference to start button
+        const trainingContainer = document.getElementById('training-container');
+        const stepContent = document.getElementById('step-content');
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+        const quizButton = document.getElementById('quiz-button');
+        const stepIndicator = document.getElementById('step-indicator');
+        const quizContainer = document.getElementById('quiz-container');
+        const quizQuestionDiv = document.getElementById('quiz-question');
+        const nextQuestionButton = document.getElementById('next-question-button');
+        const submitQuizButton = document.getElementById('submit-quiz-button');
+        const resultsScreen = document.getElementById('results-screen');
+        const resultsTitle = document.getElementById('results-title');
+        const scoreDisplay = document.getElementById('score-display');
+        const resultsMessage = document.getElementById('results-message');
+        const resultsActions = document.getElementById('results-actions');
+        const downloadCsvButton = document.getElementById('download-csv-button');
+        const restartTrainingButtonFail = document.getElementById('restart-training-button-fail'); // Get reference
+        const downloadCsvButtonCert = document.getElementById('download-csv-button-cert');
+        const certificateScreen = document.getElementById('certificate-screen');
+        const certificateRecipient = document.getElementById('certificate-recipient');
+        const certificateDate = document.getElementById('certificate-date');
+        const messageBox = document.getElementById('message-box');
+        const messageText = document.getElementById('message-text');
+
+        // --- Helper Functions ---
+
+        /**
+         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * @param {Array} array The array to shuffle.
+         * @returns {Array} The shuffled array.
+         */
+        function shuffleArray(array) {
+            let currentIndex = array.length, randomIndex;
+            const newArray = [...array]; // Create a copy to avoid modifying the original
+            while (currentIndex !== 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [newArray[currentIndex], newArray[randomIndex]] = [
+                    newArray[randomIndex], newArray[currentIndex]];
+            }
+            return newArray;
+        }
+
+        /**
+         * Gets the current date formatted as a string (e.g., "April 14, 2025").
+         * @param {string} format - The locale format string (default: 'en-US').
+         * @returns {string} The formatted date string.
+         */
+        function getCurrentDateString(format = 'en-US') {
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date().toLocaleDateString(format, options);
+        }
+
+        /**
+         * Gets the current date (YYYY-MM-DD) and time (HH:MM:SS).
+         * @returns {object} An object with 'date' and 'time' properties.
+         */
+        function getCurrentDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('en-CA'); // YYYY-MM-DD format
+            const time = now.toLocaleTimeString('en-US', { hour12: false }); // HH:MM:SS format
+            return { date, time };
+        }
+
+        /**
+         * Calculates the Firestore Timestamp for X hours ago.
+         * @param {number} hoursAgo - Number of hours to go back.
+         * @returns {firebase.firestore.Timestamp} Firestore Timestamp object.
+         */
+        function getTimestampHoursAgo(hoursAgo) {
+            const date = new Date();
+            date.setHours(date.getHours() - hoursAgo);
+            return firebase.firestore.Timestamp.fromDate(date);
+        }
+
+
+        /**
+         * Hides all screens and shows the specified screen.
+         * @param {HTMLElement} screenToShow The screen element to make visible.
+         */
+        function showScreen(screenToShow) {
+            if (!screenToShow) {
+                console.error("showScreen called with null/undefined screen");
+                return;
+            }
+            // Hide all screens first
+            welcomeScreen.classList.add('hidden');
+            trainingContainer.classList.add('hidden');
+            quizContainer.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            certificateScreen.classList.add('hidden');
+            // Show the target screen
+            screenToShow.classList.remove('hidden');
+            // Ensure body takes up height for centering
+            document.body.classList.add('min-h-screen', 'flex', 'items-center', 'justify-center');
+        }
+
+        /**
+         * Displays a message in the modal message box.
+         * @param {string} message The message to display.
+         */
+        function showMessage(message) {
+            if(messageText && messageBox){
+                messageText.textContent = message;
+                messageBox.classList.remove('hidden');
+            } else {
+                console.error("Message box elements not found");
+                alert(message); // Use native alert as a last resort
+            }
+        }
+
+        /**
+         * Closes the modal message box.
+         */
+        function closeMessageBox() {
+            if(messageBox) messageBox.classList.add('hidden');
+        }
+
+        /**
+         * Generates a PNG image of the certificate and triggers download.
+         */
+        function downloadCertificate() {
+            const certificateElement = document.getElementById('certificate-screen').querySelector('.certificate');
+            if (typeof html2canvas !== 'undefined' && html2canvas && certificateElement) {
+                html2canvas(certificateElement, {
+                    scale: 2, useCORS: true, backgroundColor: '#fefce8'
+                }).then(canvas => {
+                    const link = document.createElement('a');
+                    link.download = `Forklift_Certificate_${firstName}_${lastName}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                }).catch(err => {
+                    console.error("Error generating certificate image:", err);
+                    showMessage("Could not generate certificate image.");
+                });
+            } else {
+                showMessage("Certificate download library or element not found.");
+            }
+        }
+
+        /**
+         * Generates a CSV file with the quiz results and triggers download.
+         */
+        function downloadResults() {
+            const { date, time } = getCurrentDateTime();
+            const csvHeader = "QuizDate,QuizTime,FirstName,LastName,XLC_ID,Score,TotalQuestions,Percentage,PassFail,IncorrectQuestions\n";
+            const escapeCSV = (field) => `"${String(field).replace(/"/g, '""')}"`;
+            const safeFirstName = escapeCSV(firstName);
+            const safeLastName = escapeCSV(lastName);
+            const safeXlcId = escapeCSV(xlcId);
+            const incorrectQuestionsStr = escapeCSV(incorrectQuestions.join('; '));
+            const csvData = `${escapeCSV(date)},${escapeCSV(time)},${safeFirstName},${safeLastName},${safeXlcId},${score},${currentShuffledQuestions.length},${percentage},${escapeCSV(passStatus)},${incorrectQuestionsStr}\n`;
+            const csvContent = csvHeader + csvData;
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) {
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                const dateStr = date;
+                link.setAttribute("download", `Forklift_Quiz_${xlcId}_${dateStr}_Result.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                showMessage("CSV download is not supported in your browser.");
+            }
+        }
+
+
+        // --- Core Logic Functions ---
+
+        /**
+         * Validates user input, checks attempt limits, and starts the training steps.
+         */
+        async function startTraining() { // Made async to handle Firestore check
+            console.log("startTraining called");
+            // Disable button temporarily
+            if (startTrainingButton) startTrainingButton.disabled = true;
+
+            // Ensure input elements exist
+            if (!firstNameInput || !lastNameInput || !xlcIdInput) {
+                showMessage("Error: Input fields could not be found.");
+                console.error("Input elements missing in startTraining");
+                 if (startTrainingButton) startTrainingButton.disabled = false; // Re-enable button
+                return;
+            }
+
+            const fname = firstNameInput.value.trim();
+            const lname = lastNameInput.value.trim();
+            const id = xlcIdInput.value.trim();
+
+            // Basic validation
+            if (!fname || !lname || !id) {
+                showMessage("Please fill in all fields: First Name, Last Name, and XLC_ID.");
+                 if (startTrainingButton) startTrainingButton.disabled = false; // Re-enable button
+                return;
+            }
+
+            // Store user details (temporarily, confirm after check)
+            firstName = fname;
+            lastName = lname;
+            xlcId = id;
+
+            // --- Attempt Limit Check ---
+            if (typeof firestoreDb === 'undefined' || !firestoreDb) {
+                showMessage("Error: Cannot connect to the database to check attempts. Please try again later.");
+                console.error("Firestore not initialized in startTraining");
+                 if (startTrainingButton) startTrainingButton.disabled = false; // Re-enable button
+                return;
+            }
+
+            const timeLimit = getTimestampHoursAgo(ATTEMPT_WINDOW_HOURS);
+            console.log(`Checking attempts for XLC_ID: ${xlcId} since ${timeLimit.toDate()}`);
+
+            try {
+                // Query Firestore for recent attempts by this user
+                // NOTE: This query requires a composite index on 'xlcId' (ascending) and 'timestamp' (descending or ascending) in Firestore.
+                // If you get an error in the console about needing an index, follow the link provided in the error message to create it.
+                const querySnapshot = await firestoreDb.collection("quizResults")
+                    .where("xlcId", "==", xlcId)
+                    .where("timestamp", ">=", timeLimit)
+                    // .orderBy("timestamp", "desc") // Optional: can order if needed, but just need count
+                    .get();
+
+                attemptsToday = querySnapshot.size; // Get the count of documents found
+                console.log(`Found ${attemptsToday} attempts in the last ${ATTEMPT_WINDOW_HOURS} hours.`);
+
+                if (attemptsToday >= MAX_ATTEMPTS_PER_DAY) {
+                    showMessage(`You have reached the maximum of ${MAX_ATTEMPTS_PER_DAY} attempts allowed in a ${ATTEMPT_WINDOW_HOURS}-hour period. Please try again later.`);
+                    if (startTrainingButton) startTrainingButton.disabled = false; // Re-enable button
+                    return; // Stop execution
+                }
+
+                // --- Proceed if attempt limit not reached ---
+                currentStep = 0; // Reset step counter
+                console.log("User details set and attempt limit checked:", firstName, lastName, xlcId);
+
+                // Show the training screen
+                const targetScreen = document.getElementById('training-container');
+                if(targetScreen){
+                    console.log("Attempting to show training container...");
+                    showScreen(targetScreen);
+                    displayStep(currentStep); // Display the first step
+                } else {
+                    console.error("Training container element not found!");
+                    showMessage("Error: Could not load training steps.");
+                }
+
+            } catch (error) {
+                console.error("Error checking quiz attempts:", error);
+                // Check if the error message indicates a missing index
+                if (error.message && error.message.includes("indexes?")) {
+                     showMessage(`Database configuration needed. Please ask the administrator to create the required index in Firestore for attempt checking. Details: ${error.message}`);
+                } else {
+                    showMessage("Error checking your previous attempts. Please try again.");
+                }
+                if (startTrainingButton) startTrainingButton.disabled = false; // Re-enable button
+                return;
+            }
+             // Re-enable button if needed (e.g., if showing training screen)
+             if (startTrainingButton) startTrainingButton.disabled = false;
+        }
+
+        /**
+         * Displays the content for a specific training step.
+         * @param {number} stepIndex The index of the step to display.
+         */
+        function displayStep(stepIndex) {
+             if (stepIndex < 0 || stepIndex >= trainingSteps.length) return;
+             if (!stepContent) { console.error("stepContent element not found!"); return; }
+
+             const step = trainingSteps[stepIndex];
+             if (!step || !step.title || !step.description || typeof step.scannerContent === 'undefined') {
+                 console.error("Invalid step data for index:", stepIndex, step);
+                 stepContent.innerHTML = '<p class="text-red-500">Error loading step content.</p>';
+                 return;
+             }
+
+             stepIndicator.textContent = `Step ${stepIndex + 1} / ${trainingSteps.length}`;
+             prevButton.disabled = stepIndex === 0;
+             prevButton.classList.toggle('opacity-50', stepIndex === 0);
+             prevButton.classList.toggle('cursor-not-allowed', stepIndex === 0);
+
+             if (stepIndex === trainingSteps.length - 1) {
+                 nextButton.classList.add('hidden');
+                 quizButton.classList.remove('hidden');
+             } else {
+                 nextButton.classList.remove('hidden');
+                 quizButton.classList.add('hidden');
+             }
+
+             stepContent.classList.remove('fade-in');
+             void stepContent.offsetWidth;
+             stepContent.classList.add('fade-in');
+             stepContent.innerHTML = `
+                <h2 class="text-xl md:text-2xl font-bold text-gray-800 mb-3">${step.title}</h2>
+                <p class="text-gray-600 mb-4 whitespace-pre-line">${step.description}</p>
+                <div class="scanner-screen">${step.scannerContent.trim()}</div>
+             `;
+        }
+
+        /**
+         * Moves to the next training step.
+         */
+        function nextStep() {
+            console.log("nextStep called");
+            if (currentStep < trainingSteps.length - 1) {
+                currentStep++;
+                displayStep(currentStep);
+            }
+        }
+
+        /**
+         * Moves to the previous training step.
+         */
+        function prevStep() {
+            console.log("prevStep called");
+            if (currentStep > 0) {
+                currentStep--;
+                displayStep(currentStep);
+            }
+        }
+
+        /**
+         * Initializes and starts the quiz.
+         */
+        function startQuiz() {
+            console.log("startQuiz called");
+            // Shuffle questions for variety (already implemented)
+            currentShuffledQuestions = shuffleArray(originalQuizQuestions);
+            // Reset quiz state
+            currentQuestionIndex = 0;
+            userAnswers = new Array(currentShuffledQuestions.length).fill(null);
+            incorrectQuestions = [];
+            score = 0;
+            percentage = 0;
+            passStatus = '';
+
+            const targetScreen = document.getElementById('quiz-container');
+            if (targetScreen) {
+                 showScreen(targetScreen);
+                 displayQuestion(currentQuestionIndex);
+                 if(submitQuizButton) submitQuizButton.classList.add('hidden');
+                 if(nextQuestionButton) nextQuestionButton.classList.remove('hidden');
+            } else {
+                 console.error("Quiz container element not found!");
+                 showMessage("Error: Could not start the quiz.");
+            }
+        }
+
+        /**
+         * Displays a specific quiz question and its options.
+         * @param {number} index The index of the question to display.
+         */
+        function displayQuestion(index) {
+            if (index < 0 || index >= currentShuffledQuestions.length) return;
+            if (!quizQuestionDiv) { console.error("quizQuestionDiv element not found!"); return; }
+
+            const q = currentShuffledQuestions[index];
+            if (!q || !q.question || !Array.isArray(q.options)) {
+                console.error("Invalid question data for index:", index, q);
+                quizQuestionDiv.innerHTML = '<p class="text-red-500">Error loading question.</p>';
+                return;
+            }
+
+            let optionsHtml = `<p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p><div class="space-y-3">`;
+            q.options.forEach((option) => {
+                const escapedOption = String(option).replace(/'/g, "\\'");
+                const isSelected = userAnswers[index] === option;
+                optionsHtml += `
+                    <div
+                        class="quiz-option border-2 border-gray-300 rounded-lg p-3 hover:bg-gray-100 ${isSelected ? 'selected' : ''}"
+                        onclick="selectAnswer(${index}, '${escapedOption}')">
+                        ${option}
+                    </div>
+                `;
+            });
+            optionsHtml += '</div>';
+            quizQuestionDiv.innerHTML = optionsHtml;
+
+            if(index === currentShuffledQuestions.length - 1) {
+                 if(nextQuestionButton) nextQuestionButton.classList.add('hidden');
+                 if(submitQuizButton) submitQuizButton.classList.remove('hidden');
+            } else {
+                 if(nextQuestionButton) nextQuestionButton.classList.remove('hidden');
+                 if(submitQuizButton) submitQuizButton.classList.add('hidden');
+            }
+
+            quizQuestionDiv.classList.remove('fade-in');
+            void quizQuestionDiv.offsetWidth;
+            quizQuestionDiv.classList.add('fade-in');
+        }
+
+        /**
+         * Records the user's selected answer for a question.
+         * @param {number} questionIndex The index of the question.
+         * @param {string} answer The selected answer text.
+         */
+        function selectAnswer(questionIndex, answer) {
+            userAnswers[questionIndex] = answer;
+            displayQuestion(questionIndex); // Re-display to show selection
+        }
+
+        /**
+         * Moves to the next quiz question, validating that an answer was selected.
+         */
+        function nextQuestion() {
+            if (userAnswers[currentQuestionIndex] === null) {
+                showMessage("Please select an answer before proceeding.");
+                return;
+            }
+            if (currentQuestionIndex < currentShuffledQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion(currentQuestionIndex);
+            }
+        }
+
+        /**
+         * Calculates the quiz score, determines pass/fail status, logs results, and shows the appropriate end screen.
+         */
+        function submitQuiz() {
+            console.log("submitQuiz called");
+            if (!submitQuizButton) { console.error("Submit button not found"); return; }
+
+            submitQuizButton.disabled = true;
+            submitQuizButton.textContent = 'Submitting...';
+
+            try {
+                if (userAnswers[currentQuestionIndex] === null) {
+                    showMessage("Please select an answer for the final question.");
+                    submitQuizButton.disabled = false;
+                    submitQuizButton.textContent = 'Submit Answers';
+                    return;
+                }
+
+                score = 0;
+                incorrectQuestions = [];
+                userAnswers.forEach((answer, index) => {
+                    if (currentShuffledQuestions[index]) {
+                        if (answer === currentShuffledQuestions[index].correctAnswer) {
+                            score++;
+                        } else if (currentShuffledQuestions[index].question) {
+                            incorrectQuestions.push(currentShuffledQuestions[index].question);
+                        }
+                    } else {
+                        console.warn("Issue comparing answer for question index:", index, "- Question data missing.");
+                    }
+                });
+
+                percentage = currentShuffledQuestions.length > 0 ? Math.round((score / currentShuffledQuestions.length) * 100) : 0;
+                passStatus = percentage >= PASSING_PERCENTAGE ? 'Pass' : 'Fail';
+                attemptsToday++; // Increment attempt count for this session
+
+                console.log(`Quiz submitted: Score=${score}, Percentage=${percentage}, Status=${passStatus}, Attempt# ${attemptsToday}`);
+
+                logQuizResult()
+                    .then(() => {
+                        console.log("logQuizResult finished successfully.");
+                        if (passStatus === 'Pass') {
+                            displayCertificate();
+                        } else {
+                            displayFailScreen(); // Pass the current attempt count
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error logging result to Firestore:", error);
+                        showMessage("Could not save results to the database, but showing your outcome.");
+                        if (passStatus === 'Pass') {
+                            displayCertificate();
+                        } else {
+                            displayFailScreen(); // Pass the current attempt count
+                        }
+                    })
+                    .finally(() => {
+                        submitQuizButton.disabled = false;
+                        submitQuizButton.textContent = 'Submit Answers';
+                    });
+
+            } catch (error) {
+                console.error("Error occurred in submitQuiz function:", error);
+                showMessage("An unexpected error occurred while submitting the quiz.");
+                submitQuizButton.disabled = false;
+                submitQuizButton.textContent = 'Submit Answers';
+            }
+        }
+
+
+        /**
+         * Displays the certificate screen with user details and date.
+         */
+        function displayCertificate() {
+            console.log("displayCertificate called");
+            if (!certificateScreen || !certificateRecipient || !certificateDate) {
+                console.error("Certificate screen elements not found!");
+                return;
+            }
+            certificateRecipient.textContent = `${firstName} ${lastName}`;
+            certificateDate.textContent = getCurrentDateString();
+            showScreen(certificateScreen);
+        }
+
+        /**
+         * Displays the results screen for a failed quiz attempt, potentially disabling retry.
+         */
+        function displayFailScreen() {
+            console.log(`displayFailScreen called, attemptsToday: ${attemptsToday}`);
+            if (!resultsScreen || !resultsTitle || !scoreDisplay || !resultsMessage || !restartTrainingButtonFail) {
+                console.error("Results screen elements not found!");
+                return;
+            }
+            resultsTitle.textContent = "Quiz Results";
+            scoreDisplay.innerHTML = `
+                User: <span class="font-bold">${firstName} ${lastName}</span> (ID: ${xlcId})<br>
+                Score: <span class="font-bold">${score} / ${currentShuffledQuestions.length}</span><br>
+                Percentage: <span class="font-bold text-red-600">${percentage}%</span><br>
+                Status: <span class="font-bold text-red-600">Fail</span> (Required: ${PASSING_PERCENTAGE}%)
+            `;
+
+            // Check if the user has reached the attempt limit
+            if (attemptsToday >= MAX_ATTEMPTS_PER_DAY) {
+                resultsMessage.textContent = `You did not meet the required score and have reached the maximum of ${MAX_ATTEMPTS_PER_DAY} attempts for today. Please try again later.`;
+                restartTrainingButtonFail.disabled = true; // Disable the restart button
+                restartTrainingButtonFail.title = `Maximum attempts reached. Try again after ${ATTEMPT_WINDOW_HOURS} hours.`; // Add tooltip
+            } else {
+                const remainingAttempts = MAX_ATTEMPTS_PER_DAY - attemptsToday;
+                resultsMessage.textContent = `You did not meet the required score of ${PASSING_PERCENTAGE}%. Please review the training material carefully. You have ${remainingAttempts} attempt(s) remaining today.`;
+                restartTrainingButtonFail.disabled = false; // Ensure restart button is enabled
+                 restartTrainingButtonFail.title = ''; // Clear tooltip
+            }
+
+            showScreen(resultsScreen);
+        }
+
+        /**
+         * Logs the quiz result data to the Firestore database.
+         * @returns {Promise<firebase.firestore.DocumentReference | void>} A promise that resolves with the document reference on success, or rejects on error.
+         */
+        function logQuizResult() {
+            console.log("logQuizResult called");
+            return new Promise((resolve, reject) => {
+                if (typeof firestoreDb === 'undefined' || !firestoreDb) {
+                    const errorMsg = "Firestore not initialized! Cannot log results.";
+                    console.error(errorMsg);
+                    reject(new Error(errorMsg));
+                    return;
+                }
+
+                const { date, time } = getCurrentDateTime();
+                const resultData = {
+                    quizDate: date,
+                    quizTime: time,
+                    firstName: firstName,
+                    lastName: lastName,
+                    xlcId: xlcId,
+                    quizScore: score,
+                    quizPercentage: percentage,
+                    passFail: passStatus,
+                    incorrectQuestions: incorrectQuestions,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Crucial for time-based query
+                };
+
+                console.log("Adding document to Firestore collection 'quizResults':", resultData);
+                firestoreDb.collection("quizResults").add(resultData)
+                    .then((docRef) => {
+                        console.log("Document written with ID: ", docRef.id);
+                        resolve(docRef);
+                    })
+                    .catch((error) => {
+                        console.error("Error adding document to Firestore: ", error);
+                        reject(error);
+                    });
+            });
+        }
+
+        /**
+         * Resets the application state and returns to the welcome screen.
+         */
+        function restartTraining() {
+            console.log("restartTraining called");
+            // Clear input fields
+            if (firstNameInput) firstNameInput.value = '';
+            if (lastNameInput) lastNameInput.value = '';
+            if (xlcIdInput) xlcIdInput.value = '';
+            // Reset state variables
+            firstName = '';
+            lastName = '';
+            xlcId = '';
+            currentStep = 0;
+            currentQuestionIndex = 0;
+            userAnswers = [];
+            score = 0;
+            percentage = 0;
+            passStatus = '';
+            currentShuffledQuestions = [];
+            incorrectQuestions = [];
+            attemptsToday = 0; // Reset attempt counter for UI state
+            // Ensure buttons are re-enabled
+            if (startTrainingButton) startTrainingButton.disabled = false;
+            if (restartTrainingButtonFail) restartTrainingButtonFail.disabled = false;
+            // Show the welcome screen
+            if (welcomeScreen) showScreen(welcomeScreen);
+        }
+
+        // --- Initial Setup ---
+
+        /**
+         * Checks if all essential DOM elements are present.
+         * @returns {boolean} True if all elements are found, false otherwise.
+         */
+        function initializeApp() {
+            const essentialElements = [
+                welcomeScreen, firstNameInput, lastNameInput, xlcIdInput, startTrainingButton, // Added start button check
+                trainingContainer, stepContent, prevButton, nextButton, quizButton, stepIndicator,
+                quizContainer, quizQuestionDiv, nextQuestionButton, submitQuizButton,
+                resultsScreen, resultsTitle, scoreDisplay, resultsMessage, resultsActions, downloadCsvButton, restartTrainingButtonFail, // Added fail restart button check
+                certificateScreen, certificateRecipient, certificateDate, downloadCsvButtonCert,
+                messageBox, messageText
+            ];
+
+            const missingElement = essentialElements.find(el => !el);
+
+            if (missingElement) {
+                const missingId = essentialElements.reduce((acc, el, index) => {
+                    if (!el && !acc) {
+                        const ids = [
+                            'welcome-screen', 'firstName', 'lastName', 'xlcId', 'start-training-button',
+                            'training-container', 'step-content', 'prev-button', 'next-button', 'quiz-button', 'step-indicator',
+                            'quiz-container', 'quiz-question', 'next-question-button', 'submit-quiz-button',
+                            'results-screen', 'results-title', 'score-display', 'results-message', 'results-actions', 'download-csv-button', 'restart-training-button-fail',
+                            'certificate-screen', 'certificate-recipient', 'certificate-date', 'download-csv-button-cert',
+                            'message-box', 'message-text'
+                        ];
+                        return ids[index] || 'Unknown Element';
+                    }
+                    return acc;
+                }, null);
+
+                console.error(`Initialization failed: Element with ID '${missingId || 'Unknown'}' not found.`);
+                document.body.innerHTML = `<p style="color: red; text-align: center; padding: 20px;">Error: App could not initialize. A required element ('${missingId || 'Unknown'}') is missing.</p>`;
+                return false;
+            }
+
+            console.log("All essential application elements found.");
+            return true;
+        }
+
+        // --- Event Listener for DOMContentLoaded ---
+        document.addEventListener('DOMContentLoaded', (event) => {
+            console.log("DOM fully loaded and parsed");
+            if (typeof firestoreDb !== 'undefined' && initializeApp()) {
+                console.log("App initialized successfully.");
+                showScreen(welcomeScreen);
+            } else if (typeof firestoreDb === 'undefined') {
+                console.error("Firestore DB was not initialized. App cannot fully function.");
+                if (messageText && messageBox && initializeApp()) {
+                     showMessage("Error: Cannot connect to the database service. Attempt limits cannot be checked and results logging will be unavailable.");
+                     showScreen(welcomeScreen);
+                } else if (!initializeApp()){
+                    console.error("Cannot show welcome screen due to missing elements.")
+                } else {
+                    alert("Error: Cannot connect to the database service. Attempt limits cannot be checked and results logging will be unavailable.");
+                    showScreen(welcomeScreen);
+                }
+            } else {
+                console.error("App initialization failed due to missing DOM elements.");
+            }
+        });
+
+    </script>
+
+</body>
+</html>
